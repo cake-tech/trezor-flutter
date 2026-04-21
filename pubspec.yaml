@@ -1,0 +1,32 @@
+name: trezor_flutter
+description: A Flutter plugin to scan, connect & sign transactions using your Trezor devices
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  universal_platform: ^1.1.0
+  universal_ble: ^1.2.0
+  ledger_usb_plus: ^1.0.4
+  rxdart: ^0.28.0
+  collection: ^1.18.0
+  protobuf: ^6.0.0
+  pointycastle: ^3.7.3
+
+dev_dependencies:
+  # flutter_test:
+  #   sdk: flutter
+  flutter_lints: ^4.0.0
+  test: ^1.31.0
+
+flutter:
+
+platforms:
+  android:
+  ios:
+  web:
