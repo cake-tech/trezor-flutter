@@ -1,14 +1,19 @@
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:trezor_flutter/src/trezor/protocol2/constants.dart';
 import 'package:trezor_flutter/src/trezor/thp/state.dart';
+import 'package:trezor_flutter/src/trezor/thp/crypto/crypto.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 
 abstract class TrezorOperation<T> {
   ThpState get state;
 
   Future<List<Uint8List>> write(ByteDataWriter writer);
+
+  void writeCrc32(ByteDataWriter writer) {
+    final crc = CRC32.compute(writer.toBytes());
+    writer.writeUint32(crc);
+  }
 
   Future<T> read(ByteDataReader reader);
 

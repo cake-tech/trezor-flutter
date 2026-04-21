@@ -5,11 +5,9 @@ import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/trezor/protocol2/constants.dart';
 import 'package:trezor_flutter/src/trezor/thp/crypto/aesgcm.dart';
 import 'package:trezor_flutter/src/trezor/thp/state.dart';
-import 'package:trezor_flutter/src/utils/CRC32.dart';
+import 'package:trezor_flutter/src/trezor/thp/crypto/crypto.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/paring.dart';
-
-import '../../utils/hex_utils.dart';
 
 class TrezorThpEncryptedResponse {
   final Uint8List sessionId;
@@ -60,9 +58,7 @@ class TrezorThpEncryptedOperation extends TrezorOperation<TrezorThpEncryptedResp
     final cipheredMessage = Uint8List.fromList([...encryptedPayload, ...encryptedPayloadTag]);
     writer.write(cipheredMessage);
 
-    // Calculate and append CRC32
-    final crc = CRC32.compute(writer.toBytes());
-    writer.writeUint32(crc);
+    writeCrc32(writer);
 
     state.sync(true, "");
 
@@ -81,9 +77,6 @@ class TrezorThpEncryptedOperation extends TrezorOperation<TrezorThpEncryptedResp
     final plainText = aes.decrypt(cipherText, tag);
 
     state.sync(false, "");
-
-    print("PlainText ${hex.encode(plainText)}");
-
     final painTextReader = ByteDataReader()..add(plainText);
 
     return TrezorThpEncryptedResponse(

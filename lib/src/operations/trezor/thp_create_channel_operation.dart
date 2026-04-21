@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/trezor/protocol2/constants.dart';
 import 'package:trezor_flutter/src/trezor/thp/state.dart';
-import 'package:trezor_flutter/src/utils/CRC32.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/paring.dart';
 
@@ -31,27 +30,14 @@ class TrezorThpCreateChannelOperation extends TrezorOperation<ThpState> {
 
   @override
   Future<List<Uint8List>> write(ByteDataWriter writer) async {
-    const length = 8 + crcLength;
+    writer..writeUint8(THPControlByte.channelAllocationReq.byte)
+    ..writeUint16(0xFFFF)
+    ..writeUint16(nonce.length + crcLength)
+    ..write(nonce);
 
-    // Build message without CRC
-    final message = ByteDataWriter();
+    writeCrc32(writer);
 
-    message.writeUint8(THPControlByte.channelAllocationReq.byte);
-
-    // Channel (0xFFFF for broadcast/allocation request)
-    message.writeUint16(0xFFFF);
-
-    // Length (big-endian)
-    message.writeUint16(length);
-
-    // Nonce (8 bytes)
-    message.write(nonce);
-
-    // Calculate and append CRC32
-    final crc = CRC32.compute(message.toBytes());
-    message.writeUint32(crc);
-
-    return [message.toBytes()];
+    return [writer.toBytes()];
   }
 
   @override
@@ -69,22 +55,6 @@ class TrezorThpCreateChannelOperation extends TrezorOperation<ThpState> {
     final props = reader.read(headers.length - 14);
     final properties = ThpDeviceProperties.fromBuffer(props);
     final handshakeHash = getHandshakeHash(props);
-
-    final crc = reader.readUint32();
-
-    final message = ByteDataWriter()
-      ..writeUint8(headers.controlByteRaw)
-      ..writeUint16(headers.channel)
-      ..writeUint16(headers.length)
-      ..write(nonce)
-      ..writeUint16(proposedChannel)
-      ..write(props);
-
-    final expectedCrc = CRC32.compute(message.toBytes());
-
-    if (crc != expectedCrc) {
-      throw Exception("Crc Missmatch");
-    }
 
     state
       ..channel = proposedChannel

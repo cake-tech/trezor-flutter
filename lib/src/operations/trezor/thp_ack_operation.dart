@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/trezor/protocol2/constants.dart';
 import 'package:trezor_flutter/src/trezor/thp/state.dart';
-import 'package:trezor_flutter/src/utils/CRC32.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 
 class TrezorThpAckOperation extends TrezorOperation<void> {
@@ -23,8 +22,7 @@ class TrezorThpAckOperation extends TrezorOperation<void> {
       ..writeUint16(state.channel)
       ..writeUint16(crcLength);
 
-    final crc = CRC32.compute(writer.toBytes());
-    writer.writeUint32(crc);
+    writeCrc32(writer);
 
     return [writer.toBytes()];
   }

@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/trezor/protocol2/constants.dart';
 import 'package:trezor_flutter/src/trezor/thp/crypto/aesgcm.dart';
+import 'package:trezor_flutter/src/trezor/thp/crypto/crypto.dart';
 import 'package:trezor_flutter/src/trezor/thp/state.dart';
-import 'package:trezor_flutter/src/utils/CRC32.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/paring.dart';
 
@@ -25,19 +25,13 @@ class TrezorThpHandshakeCompletionOperation extends TrezorOperation<int> {
       ..write(encryptedPayload);
     final payload = payloadWriter.toBytes();
 
-    writer.write(addSequenceBit(THPControlByte.handshakeCompReq.byte, state.sendBit));
+    writer
+      ..write(addSequenceBit(THPControlByte.handshakeCompReq.byte, state.sendBit))
+      ..writeUint16(state.channel)
+      ..writeUint16(payload.length + crcLength)
+      ..write(payload);
 
-    // Channel (0xFFFF for broadcast/allocation request)
-    writer.writeUint16(state.channel);
-
-    // Length (big-endian)
-    writer.writeUint16(payload.length + crcLength);
-
-    writer.write(payload);
-
-    // Calculate and append CRC32
-    final crc = CRC32.compute(writer.toBytes());
-    writer.writeUint32(crc);
+    writeCrc32(writer);
 
     return [writer.toBytes()];
   }
