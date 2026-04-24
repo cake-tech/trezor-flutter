@@ -7,7 +7,7 @@ import 'package:trezor_flutter/src/models/connection_type.dart';
 import 'package:trezor_flutter/src/models/discovered_device.dart';
 import 'package:trezor_flutter/src/operations/trezor/thp_ack_operation.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
-import 'package:trezor_flutter/src/trezor/protocol2/constants.dart';
+import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
 import 'package:trezor_flutter/src/trezor/trezor_packer.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';

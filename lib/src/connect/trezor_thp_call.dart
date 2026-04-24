@@ -5,7 +5,7 @@ import 'package:trezor_flutter/src/operations/trezor/thp_ack_operation.dart';
 import 'package:trezor_flutter/src/operations/trezor/thp_encrypted_operation.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/messages-common.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
-import 'package:trezor_flutter/src/trezor/thp/state.dart';
+import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
 import 'package:trezor_flutter/src/trezor_connection.dart';
 
 

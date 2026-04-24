@@ -224,14 +224,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  ledger_usb_plus:
-    dependency: transitive
-    description:
-      name: ledger_usb_plus
-      sha256: "911df2d1d55cdae612ff2c9db140cf71a9b28a67ba16adfdc4983cd9f02c531e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.8"
   lints:
     dependency: transitive
     description:
@@ -436,6 +428,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  trezor_usb_transport:
+    dependency: transitive
+    description:
+      path: "../../trezor_usb_transport"
+      relative: true
+    source: path
+    version: "0.0.1"
   typed_data:
     dependency: transitive
     description:

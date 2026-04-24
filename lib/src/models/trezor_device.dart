@@ -1,6 +1,6 @@
-import 'package:ledger_usb_plus/usb_device.dart';
 import 'package:trezor_flutter/src/models/connection_type.dart';
 import 'package:trezor_flutter/src/trezor/trezor_device_type.dart';
+import 'package:trezor_usb_transport/usb_device.dart';
 
 class TrezorDevice {
   final String id;

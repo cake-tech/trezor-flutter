@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
-import 'package:trezor_flutter/src/trezor/protocol2/constants.dart';
-import 'package:trezor_flutter/src/trezor/thp/state.dart';
+import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
+import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/paring.dart';
 

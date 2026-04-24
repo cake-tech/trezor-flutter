@@ -5,19 +5,21 @@ import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/models/connection_type.dart';
 import 'package:trezor_flutter/src/models/trezor_device.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
+import 'package:trezor_flutter/src/trezor/protocol/decoder.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/exception_utils.dart';
-import 'package:ledger_usb_plus/ledger_usb.dart';
-import 'package:ledger_usb_plus/usb_device.dart';
+import 'package:trezor_usb_transport/trezor_usb_transport.dart';
+import 'package:trezor_usb_transport/usb_device.dart';
 import 'package:universal_ble/universal_ble.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 import '../api/api.dart';
+import 'protocol/constants/constants_v2.dart';
 
 class TrezorUsbManager extends ConnectionManager {
   bool _disposed = false;
 
-  final _usbTransport = LedgerUsb();
+  final _usbTransport = TrezorUsbTransport();
 
   TrezorUsbManager();
 
@@ -55,14 +57,26 @@ class TrezorUsbManager extends ConnectionManager {
 
     try {
       final writer = ByteDataWriter();
-      final apdus = await operation.write(writer);
-      final response = await _usbTransport.exchange(apdus);
+      final payloads = await operation.write(writer);
+      for (final payload in payloads) {
+        await _usbTransport.transferOut(payload);
+      }
+
+      var response = await _readResponse();
+
+      if (response case TrezorPackageV2 responsev2) {
+        if (responsev2.headers.controlByte == THPControlByte.ackMessage) {
+          print("AckMessage ignored");
+          response = await _readResponse();
+        }
+      }
+
       final reader = ByteDataReader();
       if (transformer != null) {
-        final transformed = await transformer.onTransform(response);
+        final transformed = await transformer.onTransform([response.asUint8List()]);
         reader.add(transformed);
       } else {
-        reader.add(response.expand((e) => e).toList());
+        reader.add(response.asUint8List());
       }
 
       return operation.read(reader);
@@ -84,9 +98,7 @@ class TrezorUsbManager extends ConnectionManager {
 
     try {
       final ledgerUsbDevices = await _usbTransport.listDevices();
-      return ledgerUsbDevices //
-          .map(TrezorDevice.usb)
-          .toList();
+      return ledgerUsbDevices.map(TrezorDevice.usb).toList();
     } on PlatformException catch (ex) {
       throw TrezorExceptionUtils.fromPlatformException(ex, connectionType);
     }
@@ -117,5 +129,19 @@ class TrezorUsbManager extends ConnectionManager {
     } on PlatformException catch (ex) {
       throw TrezorExceptionUtils.fromPlatformException(ex, connectionType);
     }
+  }
+
+  Future<TrezorPackage> _readResponse() async {
+    final firstPackageRaw = await _usbTransport.transferIn();
+    var package = TrezorDecoder.decodePackage(firstPackageRaw!);
+
+    while (package.needsContinuationPacket) {
+      final packageRaw = await _usbTransport.transferIn();
+      final continuationPacket = TrezorDecoder.decodePackage(packageRaw!);
+
+      package = TrezorDecoder.reconstructV2Payload([package, continuationPacket]);
+    }
+
+    return package;
   }
 }

@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:trezor_flutter/src/api/api.dart';
-import 'package:trezor_flutter/src/trezor/protocol2/constants.dart';
-import 'package:trezor_flutter/src/trezor/thp/crypto/crypto.dart';
+import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
+import 'package:trezor_flutter/src/trezor/crypto/crypto.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 
 class CrcValidator extends TrezorTransformer {

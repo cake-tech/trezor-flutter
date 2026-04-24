@@ -1,5 +1,5 @@
 // https://github.com/trezor/trezor-suite/blob/develop/packages/protocol/src/protocol-v2/constants.ts
-const headerSize = 1 + 2; // 1: control_byte + 2: channel
+const thpHeaderSize = 1 + 2; // 1: control_byte + 2: channel
 const messageLenSize = 2;
 
 const crcLength = 4;

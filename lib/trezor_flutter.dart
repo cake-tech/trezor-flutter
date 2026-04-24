@@ -13,9 +13,9 @@ export 'src/operations/trezor/thp_handshake_init_operation.dart';
 export 'src/operations/trezor/thp_handshake_completion_operation.dart';
 export 'src/operations/trezor/thp_ack_operation.dart';
 
-export 'src/trezor/thp/paring.dart';
+export 'src/trezor/protocol/v2/paring.dart';
 
-export 'src/trezor/thp/state.dart';
+export 'src/trezor/protocol/v2/state.dart';
 
 export 'src/utils/curve25519.dart';
 

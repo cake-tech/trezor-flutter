@@ -2,10 +2,9 @@ import 'dart:typed_data';
 
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
-import 'package:trezor_flutter/src/trezor/thp/paring.dart';
-import 'package:trezor_flutter/src/trezor/thp/state.dart';
+import 'package:trezor_flutter/src/trezor/protocol/v2/paring.dart';
+import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
-import 'package:trezor_flutter/src/utils/paring.dart';
 
 void main() {
   group('pairing', () {

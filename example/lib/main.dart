@@ -1,12 +1,13 @@
 import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:example/widgets/device_card.dart';
 import 'package:example/widgets/pin_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
+
+
+bool usbMode = false;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,20 +50,24 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    trezorInterface = TrezorInterface.ble(
-      onPermissionRequest: (_) async {
-        if (Platform.isMacOS) return true;
+    if (usbMode) {
+      trezorInterface = TrezorInterface.usb();
+    } else {
+      trezorInterface = TrezorInterface.ble(
+        onPermissionRequest: (_) async {
+          if (Platform.isMacOS) return true;
 
-        Map<Permission, PermissionStatus> statuses = await [
-          Permission.bluetoothScan,
-          Permission.bluetoothConnect,
-          Permission.bluetoothAdvertise,
-        ].request();
+          Map<Permission, PermissionStatus> statuses = await [
+            Permission.bluetoothScan,
+            Permission.bluetoothConnect,
+            Permission.bluetoothAdvertise,
+          ].request();
 
-        return statuses.values.where((status) => status.isDenied).isEmpty;
-      },
-      bleOptions: BluetoothOptions(maxScanDuration: Duration(minutes: 5)),
-    );
+          return statuses.values.where((status) => status.isDenied).isEmpty;
+        },
+        bleOptions: BluetoothOptions(maxScanDuration: Duration(minutes: 5)),
+      );
+    }
 
     trezorInterface.scan().listen(
       (device) => setState(() {

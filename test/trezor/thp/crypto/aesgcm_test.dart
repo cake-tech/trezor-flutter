@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:test/test.dart';
-import 'package:trezor_flutter/src/trezor/thp/crypto/aesgcm.dart';
+import 'package:trezor_flutter/src/trezor/crypto/aesgcm.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
 
 void main() {
