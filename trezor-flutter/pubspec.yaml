@@ -13,7 +13,7 @@ dependencies:
   universal_platform: ^1.1.0
   universal_ble: ^1.2.0
   trezor_usb_transport:
-    path: ../trezor_usb_transport
+    path: ../../trezor_usb_transport
   rxdart: ^0.28.0
   collection: ^1.18.0
   protobuf: ^6.0.0

@@ -7,7 +7,7 @@ import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/paring.dart';
 
-class TrezorThpHandshakeCompletionOperation extends TrezorOperation<int> {
+class TrezorThpHandshakeCompletionOperation extends TrezorTHPOperation<int> {
   @override
   final ThpState state;
 

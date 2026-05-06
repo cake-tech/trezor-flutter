@@ -18,7 +18,7 @@ class ThpHandshakeInitResponse {
   });
 }
 
-class TrezorThpHandshakeInitOperation extends TrezorOperation<ThpHandshakeInitResponse> {
+class TrezorThpHandshakeInitOperation extends TrezorTHPOperation<ThpHandshakeInitResponse> {
   @override
   final ThpState state;
 

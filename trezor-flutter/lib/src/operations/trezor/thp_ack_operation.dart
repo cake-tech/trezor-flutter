@@ -5,7 +5,7 @@ import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
 import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 
-class TrezorThpAckOperation extends TrezorOperation<void> {
+class TrezorThpAckOperation extends TrezorTHPOperation<void> {
 
   @override
   final ThpState state;

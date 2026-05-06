@@ -6,16 +6,43 @@ import 'package:trezor_flutter/src/trezor/crypto/crypto.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 
 abstract class TrezorOperation<T> {
-  ThpState get state;
+  int get protocolVersion => 2;
 
   Future<List<Uint8List>> write(ByteDataWriter writer);
+
+  Future<T> read(ByteDataReader reader);
+
+  ThpHeaders readHeaders(ByteDataReader reader) {
+    final controlByteRaw = reader.readUint8();
+    final channel = reader.readUint16();
+    final length = reader.readUint16();
+
+    return ThpHeaders(controlByteRaw: controlByteRaw, channel: channel, length: length);
+  }
+
+  String readError(ByteDataReader reader) {
+    switch (reader.readUint8()) {
+      case 0x01:
+        return "ThpTransportBusy";
+      case 0x02:
+        return "ThpUnallocatedChannel";
+      case 0x03:
+        return "ThpDecryptionFailed";
+      case 0x05:
+        return "ThpDeviceLocked";
+      default:
+        return "ThpUnknownError";
+    }
+  }
+}
+
+abstract class TrezorTHPOperation<T> extends TrezorOperation<T> {
+  ThpState get state;
 
   void writeCrc32(ByteDataWriter writer) {
     final crc = CRC32.compute(writer.toBytes());
     writer.writeUint32(crc);
   }
-
-  Future<T> read(ByteDataReader reader);
 
   Uint8List addAckBit(int magic, int ackBit) {
     final data = ByteData(1)..setUint8(0, magic | (ackBit << 3));
@@ -27,6 +54,7 @@ abstract class TrezorOperation<T> {
     return data.buffer.asUint8List();
   }
 
+  @override
   ThpHeaders readHeaders(ByteDataReader reader) {
     final controlByteRaw = reader.readUint8();
     final channel = reader.readUint16();
@@ -35,6 +63,7 @@ abstract class TrezorOperation<T> {
     return ThpHeaders(controlByteRaw: controlByteRaw, channel: channel, length: length);
   }
 
+  @override
   String readError(ByteDataReader reader) {
     switch (reader.readUint8()) {
       case 0x01:

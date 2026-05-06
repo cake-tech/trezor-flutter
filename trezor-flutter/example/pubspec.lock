@@ -431,7 +431,7 @@ packages:
   trezor_usb_transport:
     dependency: transitive
     description:
-      path: "../../trezor_usb_transport"
+      path: "../../../trezor_usb_transport"
       relative: true
     source: path
     version: "0.0.1"

@@ -19,7 +19,7 @@ class TrezorThpEncryptedResponse {
   TrezorMessageType get messageType => TrezorMessageType.fromRaw(messageTypeRaw);
 }
 
-class TrezorThpEncryptedOperation extends TrezorOperation<TrezorThpEncryptedResponse> {
+class TrezorThpEncryptedOperation extends TrezorTHPOperation<TrezorThpEncryptedResponse> {
   @override
   final ThpState state;
 

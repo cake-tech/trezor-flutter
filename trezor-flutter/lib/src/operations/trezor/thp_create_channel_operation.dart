@@ -9,7 +9,7 @@ import 'package:trezor_flutter/src/utils/paring.dart';
 
 import '../../trezor/protobuf/messages-thp.pb.dart';
 
-class TrezorThpCreateChannelOperation extends TrezorOperation<ThpState> {
+class TrezorThpCreateChannelOperation extends TrezorTHPOperation<ThpState> {
   @override
   final ThpState state;
 
