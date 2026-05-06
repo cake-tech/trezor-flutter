@@ -7,7 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
 
-bool usbMode = false;
+bool usbMode = true;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

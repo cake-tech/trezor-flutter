@@ -8,6 +8,7 @@ import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/trezor/protocol/decoder.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/exception_utils.dart';
+import 'package:trezor_flutter/trezor_flutter.dart';
 import 'package:trezor_usb_transport/trezor_usb_transport.dart';
 import 'package:trezor_usb_transport/usb_device.dart';
 import 'package:universal_ble/universal_ble.dart';
@@ -62,6 +63,10 @@ class TrezorUsbManager extends ConnectionManager {
         await _usbTransport.transferOut(payload);
       }
 
+      final reader = ByteDataReader();
+      if (operation is TrezorThpAckOperation) return operation.read(reader);
+
+
       var response = await _readResponse();
 
       if (response case TrezorPackageV2 responsev2) {
@@ -71,7 +76,7 @@ class TrezorUsbManager extends ConnectionManager {
         }
       }
 
-      final reader = ByteDataReader();
+
       if (transformer != null) {
         final transformed = await transformer.onTransform([response.asUint8List()]);
         reader.add(transformed);
