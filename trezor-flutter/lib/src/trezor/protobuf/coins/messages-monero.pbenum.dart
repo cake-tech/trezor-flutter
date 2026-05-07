@@ -1,43 +1,30 @@
-// This is a generated file - do not edit.
+///
+//  Generated code. Do not modify.
+//  source: messages-monero.proto
 //
-// Generated from messages-monero.proto.
+// @dart = 2.12
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
-// @dart = 3.3
-
-// ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: curly_braces_in_flow_control_structures
-// ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
-
+// ignore_for_file: UNDEFINED_SHOWN_NAME
 import 'dart:core' as $core;
-
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class MoneroNetworkType extends $pb.ProtobufEnum {
-  static const MoneroNetworkType MAINNET =
-      MoneroNetworkType._(0, _omitEnumNames ? '' : 'MAINNET');
-  static const MoneroNetworkType TESTNET =
-      MoneroNetworkType._(1, _omitEnumNames ? '' : 'TESTNET');
-  static const MoneroNetworkType STAGENET =
-      MoneroNetworkType._(2, _omitEnumNames ? '' : 'STAGENET');
-  static const MoneroNetworkType FAKECHAIN =
-      MoneroNetworkType._(3, _omitEnumNames ? '' : 'FAKECHAIN');
+  static const MoneroNetworkType MAINNET = MoneroNetworkType._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'MAINNET');
+  static const MoneroNetworkType TESTNET = MoneroNetworkType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'TESTNET');
+  static const MoneroNetworkType STAGENET = MoneroNetworkType._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'STAGENET');
+  static const MoneroNetworkType FAKECHAIN = MoneroNetworkType._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'FAKECHAIN');
 
-  static const $core.List<MoneroNetworkType> values = <MoneroNetworkType>[
+  static const $core.List<MoneroNetworkType> values = <MoneroNetworkType> [
     MAINNET,
     TESTNET,
     STAGENET,
     FAKECHAIN,
   ];
 
-  static final $core.List<MoneroNetworkType?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 3);
-  static MoneroNetworkType? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.Map<$core.int, MoneroNetworkType> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static MoneroNetworkType? valueOf($core.int value) => _byValue[value];
 
-  const MoneroNetworkType._(super.value, super.name);
+  const MoneroNetworkType._($core.int v, $core.String n) : super(v, n);
 }
 
-const $core.bool _omitEnumNames =
-    $core.bool.fromEnvironment('protobuf.omit_enum_names');

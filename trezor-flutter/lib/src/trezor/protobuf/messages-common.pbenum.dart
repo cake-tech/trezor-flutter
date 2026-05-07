@@ -1,65 +1,36 @@
-// This is a generated file - do not edit.
+///
+//  Generated code. Do not modify.
+//  source: messages-common.proto
 //
-// Generated from messages-common.proto.
+// @dart = 2.12
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
-// @dart = 3.3
-
-// ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: curly_braces_in_flow_control_structures
-// ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_relative_imports
-
+// ignore_for_file: UNDEFINED_SHOWN_NAME
 import 'dart:core' as $core;
-
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class Failure_FailureType extends $pb.ProtobufEnum {
-  static const Failure_FailureType Failure_UnexpectedMessage =
-      Failure_FailureType._(
-          1, _omitEnumNames ? '' : 'Failure_UnexpectedMessage');
-  static const Failure_FailureType Failure_ButtonExpected =
-      Failure_FailureType._(2, _omitEnumNames ? '' : 'Failure_ButtonExpected');
-  static const Failure_FailureType Failure_DataError =
-      Failure_FailureType._(3, _omitEnumNames ? '' : 'Failure_DataError');
-  static const Failure_FailureType Failure_ActionCancelled =
-      Failure_FailureType._(4, _omitEnumNames ? '' : 'Failure_ActionCancelled');
-  static const Failure_FailureType Failure_PinExpected =
-      Failure_FailureType._(5, _omitEnumNames ? '' : 'Failure_PinExpected');
-  static const Failure_FailureType Failure_PinCancelled =
-      Failure_FailureType._(6, _omitEnumNames ? '' : 'Failure_PinCancelled');
-  static const Failure_FailureType Failure_PinInvalid =
-      Failure_FailureType._(7, _omitEnumNames ? '' : 'Failure_PinInvalid');
-  static const Failure_FailureType Failure_InvalidSignature =
-      Failure_FailureType._(
-          8, _omitEnumNames ? '' : 'Failure_InvalidSignature');
-  static const Failure_FailureType Failure_ProcessError =
-      Failure_FailureType._(9, _omitEnumNames ? '' : 'Failure_ProcessError');
-  static const Failure_FailureType Failure_NotEnoughFunds =
-      Failure_FailureType._(10, _omitEnumNames ? '' : 'Failure_NotEnoughFunds');
-  static const Failure_FailureType Failure_NotInitialized =
-      Failure_FailureType._(11, _omitEnumNames ? '' : 'Failure_NotInitialized');
-  static const Failure_FailureType Failure_PinMismatch =
-      Failure_FailureType._(12, _omitEnumNames ? '' : 'Failure_PinMismatch');
-  static const Failure_FailureType Failure_WipeCodeMismatch =
-      Failure_FailureType._(
-          13, _omitEnumNames ? '' : 'Failure_WipeCodeMismatch');
-  static const Failure_FailureType Failure_InvalidSession =
-      Failure_FailureType._(14, _omitEnumNames ? '' : 'Failure_InvalidSession');
-  static const Failure_FailureType Failure_Busy =
-      Failure_FailureType._(15, _omitEnumNames ? '' : 'Failure_Busy');
-  static const Failure_FailureType Failure_ThpUnallocatedSession =
-      Failure_FailureType._(
-          16, _omitEnumNames ? '' : 'Failure_ThpUnallocatedSession');
-  static const Failure_FailureType Failure_InvalidProtocol =
-      Failure_FailureType._(
-          17, _omitEnumNames ? '' : 'Failure_InvalidProtocol');
-  static const Failure_FailureType Failure_InProgress =
-      Failure_FailureType._(19, _omitEnumNames ? '' : 'Failure_InProgress');
-  static const Failure_FailureType Failure_FirmwareError =
-      Failure_FailureType._(99, _omitEnumNames ? '' : 'Failure_FirmwareError');
+  static const Failure_FailureType Failure_UnexpectedMessage = Failure_FailureType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_UnexpectedMessage');
+  static const Failure_FailureType Failure_ButtonExpected = Failure_FailureType._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_ButtonExpected');
+  static const Failure_FailureType Failure_DataError = Failure_FailureType._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_DataError');
+  static const Failure_FailureType Failure_ActionCancelled = Failure_FailureType._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_ActionCancelled');
+  static const Failure_FailureType Failure_PinExpected = Failure_FailureType._(5, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_PinExpected');
+  static const Failure_FailureType Failure_PinCancelled = Failure_FailureType._(6, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_PinCancelled');
+  static const Failure_FailureType Failure_PinInvalid = Failure_FailureType._(7, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_PinInvalid');
+  static const Failure_FailureType Failure_InvalidSignature = Failure_FailureType._(8, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_InvalidSignature');
+  static const Failure_FailureType Failure_ProcessError = Failure_FailureType._(9, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_ProcessError');
+  static const Failure_FailureType Failure_NotEnoughFunds = Failure_FailureType._(10, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_NotEnoughFunds');
+  static const Failure_FailureType Failure_NotInitialized = Failure_FailureType._(11, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_NotInitialized');
+  static const Failure_FailureType Failure_PinMismatch = Failure_FailureType._(12, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_PinMismatch');
+  static const Failure_FailureType Failure_WipeCodeMismatch = Failure_FailureType._(13, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_WipeCodeMismatch');
+  static const Failure_FailureType Failure_InvalidSession = Failure_FailureType._(14, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_InvalidSession');
+  static const Failure_FailureType Failure_Busy = Failure_FailureType._(15, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_Busy');
+  static const Failure_FailureType Failure_ThpUnallocatedSession = Failure_FailureType._(16, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_ThpUnallocatedSession');
+  static const Failure_FailureType Failure_InvalidProtocol = Failure_FailureType._(17, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_InvalidProtocol');
+  static const Failure_FailureType Failure_InProgress = Failure_FailureType._(19, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_InProgress');
+  static const Failure_FailureType Failure_FirmwareError = Failure_FailureType._(99, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Failure_FirmwareError');
 
-  static const $core.List<Failure_FailureType> values = <Failure_FailureType>[
+  static const $core.List<Failure_FailureType> values = <Failure_FailureType> [
     Failure_UnexpectedMessage,
     Failure_ButtonExpected,
     Failure_DataError,
@@ -81,81 +52,35 @@ class Failure_FailureType extends $pb.ProtobufEnum {
     Failure_FirmwareError,
   ];
 
-  static final $core.Map<$core.int, Failure_FailureType> _byValue =
-      $pb.ProtobufEnum.initByValue(values);
+  static final $core.Map<$core.int, Failure_FailureType> _byValue = $pb.ProtobufEnum.initByValue(values);
   static Failure_FailureType? valueOf($core.int value) => _byValue[value];
 
-  const Failure_FailureType._(super.value, super.name);
+  const Failure_FailureType._($core.int v, $core.String n) : super(v, n);
 }
 
-/// *
-///  Type of button request
 class ButtonRequest_ButtonRequestType extends $pb.ProtobufEnum {
-  static const ButtonRequest_ButtonRequestType ButtonRequest_Other =
-      ButtonRequest_ButtonRequestType._(
-          1, _omitEnumNames ? '' : 'ButtonRequest_Other');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_FeeOverThreshold =
-      ButtonRequest_ButtonRequestType._(
-          2, _omitEnumNames ? '' : 'ButtonRequest_FeeOverThreshold');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_ConfirmOutput =
-      ButtonRequest_ButtonRequestType._(
-          3, _omitEnumNames ? '' : 'ButtonRequest_ConfirmOutput');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_ResetDevice =
-      ButtonRequest_ButtonRequestType._(
-          4, _omitEnumNames ? '' : 'ButtonRequest_ResetDevice');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_ConfirmWord =
-      ButtonRequest_ButtonRequestType._(
-          5, _omitEnumNames ? '' : 'ButtonRequest_ConfirmWord');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_WipeDevice =
-      ButtonRequest_ButtonRequestType._(
-          6, _omitEnumNames ? '' : 'ButtonRequest_WipeDevice');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_ProtectCall =
-      ButtonRequest_ButtonRequestType._(
-          7, _omitEnumNames ? '' : 'ButtonRequest_ProtectCall');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_SignTx =
-      ButtonRequest_ButtonRequestType._(
-          8, _omitEnumNames ? '' : 'ButtonRequest_SignTx');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_FirmwareCheck =
-      ButtonRequest_ButtonRequestType._(
-          9, _omitEnumNames ? '' : 'ButtonRequest_FirmwareCheck');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_Address =
-      ButtonRequest_ButtonRequestType._(
-          10, _omitEnumNames ? '' : 'ButtonRequest_Address');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_PublicKey =
-      ButtonRequest_ButtonRequestType._(
-          11, _omitEnumNames ? '' : 'ButtonRequest_PublicKey');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_MnemonicWordCount =
-      ButtonRequest_ButtonRequestType._(
-          12, _omitEnumNames ? '' : 'ButtonRequest_MnemonicWordCount');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_MnemonicInput =
-      ButtonRequest_ButtonRequestType._(
-          13, _omitEnumNames ? '' : 'ButtonRequest_MnemonicInput');
-  @$core.Deprecated('This enum value is deprecated')
-  static const ButtonRequest_ButtonRequestType
-      Deprecated_ButtonRequest_PassphraseType_ =
-      ButtonRequest_ButtonRequestType._(
-          14, _omitEnumNames ? '' : '_Deprecated_ButtonRequest_PassphraseType');
-  static const ButtonRequest_ButtonRequestType
-      ButtonRequest_UnknownDerivationPath = ButtonRequest_ButtonRequestType._(
-          15, _omitEnumNames ? '' : 'ButtonRequest_UnknownDerivationPath');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_RecoveryHomepage =
-      ButtonRequest_ButtonRequestType._(
-          16, _omitEnumNames ? '' : 'ButtonRequest_RecoveryHomepage');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_Success =
-      ButtonRequest_ButtonRequestType._(
-          17, _omitEnumNames ? '' : 'ButtonRequest_Success');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_Warning =
-      ButtonRequest_ButtonRequestType._(
-          18, _omitEnumNames ? '' : 'ButtonRequest_Warning');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_PassphraseEntry =
-      ButtonRequest_ButtonRequestType._(
-          19, _omitEnumNames ? '' : 'ButtonRequest_PassphraseEntry');
-  static const ButtonRequest_ButtonRequestType ButtonRequest_PinEntry =
-      ButtonRequest_ButtonRequestType._(
-          20, _omitEnumNames ? '' : 'ButtonRequest_PinEntry');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_Other = ButtonRequest_ButtonRequestType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_Other');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_FeeOverThreshold = ButtonRequest_ButtonRequestType._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_FeeOverThreshold');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_ConfirmOutput = ButtonRequest_ButtonRequestType._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_ConfirmOutput');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_ResetDevice = ButtonRequest_ButtonRequestType._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_ResetDevice');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_ConfirmWord = ButtonRequest_ButtonRequestType._(5, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_ConfirmWord');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_WipeDevice = ButtonRequest_ButtonRequestType._(6, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_WipeDevice');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_ProtectCall = ButtonRequest_ButtonRequestType._(7, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_ProtectCall');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_SignTx = ButtonRequest_ButtonRequestType._(8, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_SignTx');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_FirmwareCheck = ButtonRequest_ButtonRequestType._(9, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_FirmwareCheck');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_Address = ButtonRequest_ButtonRequestType._(10, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_Address');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_PublicKey = ButtonRequest_ButtonRequestType._(11, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_PublicKey');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_MnemonicWordCount = ButtonRequest_ButtonRequestType._(12, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_MnemonicWordCount');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_MnemonicInput = ButtonRequest_ButtonRequestType._(13, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_MnemonicInput');
+  static const ButtonRequest_ButtonRequestType Deprecated_ButtonRequest_PassphraseType_ = ButtonRequest_ButtonRequestType._(14, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : '_Deprecated_ButtonRequest_PassphraseType');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_UnknownDerivationPath = ButtonRequest_ButtonRequestType._(15, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_UnknownDerivationPath');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_RecoveryHomepage = ButtonRequest_ButtonRequestType._(16, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_RecoveryHomepage');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_Success = ButtonRequest_ButtonRequestType._(17, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_Success');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_Warning = ButtonRequest_ButtonRequestType._(18, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_Warning');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_PassphraseEntry = ButtonRequest_ButtonRequestType._(19, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_PassphraseEntry');
+  static const ButtonRequest_ButtonRequestType ButtonRequest_PinEntry = ButtonRequest_ButtonRequestType._(20, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ButtonRequest_PinEntry');
 
-  static const $core.List<ButtonRequest_ButtonRequestType> values =
-      <ButtonRequest_ButtonRequestType>[
+  static const $core.List<ButtonRequest_ButtonRequestType> values = <ButtonRequest_ButtonRequestType> [
     ButtonRequest_Other,
     ButtonRequest_FeeOverThreshold,
     ButtonRequest_ConfirmOutput,
@@ -178,37 +103,20 @@ class ButtonRequest_ButtonRequestType extends $pb.ProtobufEnum {
     ButtonRequest_PinEntry,
   ];
 
-  static final $core.List<ButtonRequest_ButtonRequestType?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 20);
-  static ButtonRequest_ButtonRequestType? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.Map<$core.int, ButtonRequest_ButtonRequestType> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static ButtonRequest_ButtonRequestType? valueOf($core.int value) => _byValue[value];
 
-  const ButtonRequest_ButtonRequestType._(super.value, super.name);
+  const ButtonRequest_ButtonRequestType._($core.int v, $core.String n) : super(v, n);
 }
 
-/// *
-///  Type of PIN request
 class PinMatrixRequest_PinMatrixRequestType extends $pb.ProtobufEnum {
-  static const PinMatrixRequest_PinMatrixRequestType
-      PinMatrixRequestType_Current = PinMatrixRequest_PinMatrixRequestType._(
-          1, _omitEnumNames ? '' : 'PinMatrixRequestType_Current');
-  static const PinMatrixRequest_PinMatrixRequestType
-      PinMatrixRequestType_NewFirst = PinMatrixRequest_PinMatrixRequestType._(
-          2, _omitEnumNames ? '' : 'PinMatrixRequestType_NewFirst');
-  static const PinMatrixRequest_PinMatrixRequestType
-      PinMatrixRequestType_NewSecond = PinMatrixRequest_PinMatrixRequestType._(
-          3, _omitEnumNames ? '' : 'PinMatrixRequestType_NewSecond');
-  static const PinMatrixRequest_PinMatrixRequestType
-      PinMatrixRequestType_WipeCodeFirst =
-      PinMatrixRequest_PinMatrixRequestType._(
-          4, _omitEnumNames ? '' : 'PinMatrixRequestType_WipeCodeFirst');
-  static const PinMatrixRequest_PinMatrixRequestType
-      PinMatrixRequestType_WipeCodeSecond =
-      PinMatrixRequest_PinMatrixRequestType._(
-          5, _omitEnumNames ? '' : 'PinMatrixRequestType_WipeCodeSecond');
+  static const PinMatrixRequest_PinMatrixRequestType PinMatrixRequestType_Current = PinMatrixRequest_PinMatrixRequestType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'PinMatrixRequestType_Current');
+  static const PinMatrixRequest_PinMatrixRequestType PinMatrixRequestType_NewFirst = PinMatrixRequest_PinMatrixRequestType._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'PinMatrixRequestType_NewFirst');
+  static const PinMatrixRequest_PinMatrixRequestType PinMatrixRequestType_NewSecond = PinMatrixRequest_PinMatrixRequestType._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'PinMatrixRequestType_NewSecond');
+  static const PinMatrixRequest_PinMatrixRequestType PinMatrixRequestType_WipeCodeFirst = PinMatrixRequest_PinMatrixRequestType._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'PinMatrixRequestType_WipeCodeFirst');
+  static const PinMatrixRequest_PinMatrixRequestType PinMatrixRequestType_WipeCodeSecond = PinMatrixRequest_PinMatrixRequestType._(5, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'PinMatrixRequestType_WipeCodeSecond');
 
-  static const $core.List<PinMatrixRequest_PinMatrixRequestType> values =
-      <PinMatrixRequest_PinMatrixRequestType>[
+  static const $core.List<PinMatrixRequest_PinMatrixRequestType> values = <PinMatrixRequest_PinMatrixRequestType> [
     PinMatrixRequestType_Current,
     PinMatrixRequestType_NewFirst,
     PinMatrixRequestType_NewSecond,
@@ -216,13 +124,9 @@ class PinMatrixRequest_PinMatrixRequestType extends $pb.ProtobufEnum {
     PinMatrixRequestType_WipeCodeSecond,
   ];
 
-  static final $core.List<PinMatrixRequest_PinMatrixRequestType?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 5);
-  static PinMatrixRequest_PinMatrixRequestType? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.Map<$core.int, PinMatrixRequest_PinMatrixRequestType> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static PinMatrixRequest_PinMatrixRequestType? valueOf($core.int value) => _byValue[value];
 
-  const PinMatrixRequest_PinMatrixRequestType._(super.value, super.name);
+  const PinMatrixRequest_PinMatrixRequestType._($core.int v, $core.String n) : super(v, n);
 }
 
-const $core.bool _omitEnumNames =
-    $core.bool.fromEnvironment('protobuf.omit_enum_names');
