@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
-
 bool usbMode = true;
+bool useV1 = false;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,6 +77,17 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
+  void clearList() {
+    setState(() => bleDevices.clear());
+    if (usbMode) {
+      trezorInterface.scan().listen(
+        (device) => setState(() {
+          bleDevices.add(device);
+        }),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -97,24 +108,26 @@ class _HomePageState extends State<HomePage> {
 
                 print("connected!");
 
-                Future<String> onCodePin() async {
-                  final res = await showDialog<String>(
-                    context: context,
-                    builder: (context) => PinPopup(),
+                if (!useV1) {
+                  Future<String> onCodePin() async {
+                    final res = await showDialog<String>(
+                      context: context,
+                      builder: (context) => PinPopup(),
+                    );
+                    if (res == null) throw Exception();
+                    return res;
+                  }
+
+                  await getThpChannel(
+                    connection,
+                    state,
+                    appName: "Cake Tech",
+                    hostName: "Cake Wallet Dev Phone",
+                    onCodeCode: onCodePin,
                   );
-                  if (res == null) throw Exception();
-                  return res;
                 }
 
-                await getThpChannel(
-                  connection,
-                  state,
-                  appName: "Cake Tech",
-                  hostName: "Cake Wallet Dev Phone",
-                  onCodeCode: onCodePin,
-                );
-
-                final monAddress = await moneroTest(connection, state);
+                final monAddress = await moneroTest(connection, state, useV1);
                 setState(() => moneroAddress = monAddress);
               },
             ),
@@ -125,17 +138,13 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextButton(
-                onPressed: () => setState(() => bleDevices.clear()),
-                child: Text("Clear List"),
-              ),
+              TextButton(onPressed: clearList, child: Text("Clear List")),
               TextButton(
                 onPressed: () => setState(() => state = ThpState()),
                 child: Text("Reset State"),
               ),
             ],
-          )
-
+          ),
         ],
       ),
     ),

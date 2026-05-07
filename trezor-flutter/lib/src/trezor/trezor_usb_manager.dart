@@ -144,7 +144,11 @@ class TrezorUsbManager extends ConnectionManager {
       final packageRaw = await _usbTransport.transferIn();
       final continuationPacket = TrezorDecoder.decodePackage(packageRaw!);
 
-      package = TrezorDecoder.reconstructV2Payload([package, continuationPacket]);
+      if (package is TrezorPackageV1) {
+        package = TrezorDecoder.reconstructV1Payload([package, continuationPacket]);
+      } else if (package is TrezorPackageV2) {
+        package = TrezorDecoder.reconstructV2Payload([package, continuationPacket]);
+      }
     }
 
     return package;

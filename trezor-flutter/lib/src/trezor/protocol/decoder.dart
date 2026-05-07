@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 
@@ -10,16 +11,24 @@ class TrezorDecoder {
   static int getProtocolVersion(Uint8List bytes) => bytes.first == v1MessageMagicHeaderByte ? 1 : 2;
 
   static TrezorPackage decodePackage(Uint8List bytes) {
-    final reader = ByteDataReader()..add(bytes);
+    final reader = ByteDataReader()
+      ..add(bytes);
 
     final controlByteRaw = reader.readUint8();
 
     if (controlByteRaw == v1MessageMagicHeaderByte) {
-      final payload = reader.read(reader.remainingLength);
+      if (listEquals(bytes.sublist(1, 3), [0x23, 0x23])) {
+        reader.read(2);
+        final messageType = reader.readUint16();
+        final length = reader.readUint32();
+        final payload =
+        reader.read(length < reader.remainingLength ? length : reader.remainingLength);
 
-      if (payload.first == v1MessageHeaderByte) {
-        // ToDo: (konstantinullrich) Handle v1 Packages;
+        return TrezorPackageV1(length: length, messageType: messageType, payload: payload);
       }
+
+      final payload =
+      reader.read(reader.remainingLength);
 
       return TrezorContinuationPacketPackageV1(payload: payload);
     } else if (controlByteRaw == THPControlByte.continuationPacket.byte) {
@@ -58,7 +67,7 @@ class TrezorDecoder {
 
     if (payload.length >= headers!.length) {
       final crc =
-          ByteData.sublistView(Uint8List.fromList(payload)).getUint32(headers.length - crcLength);
+      ByteData.sublistView(Uint8List.fromList(payload)).getUint32(headers.length - crcLength);
 
       return TrezorPackageV2(
         headers: headers,
@@ -68,6 +77,24 @@ class TrezorDecoder {
     }
 
     return TrezorPackageV2(headers: headers, payload: Uint8List.fromList(payload));
+  }
+
+  static TrezorPackageV1 reconstructV1Payload(List<TrezorPackage> packages) {
+    final payload = <int>[];
+
+    int length = 0;
+    int messageType = 0;
+    if (packages.first case TrezorPackageV1 packageV1) {
+      length = packageV1.length;
+      messageType = packageV1.messageType;
+    }
+
+    for (final package in packages) {
+      payload.addAll(package.payload);
+    }
+
+    return TrezorPackageV1(
+        length: length, messageType: messageType, payload: Uint8List.fromList(payload));
   }
 }
 
@@ -89,7 +116,8 @@ class TrezorPackageV2 extends TrezorPackage {
     result.addAll(payload);
 
     if (crc != null) {
-      final crcBytes = ByteData(4)..setUint32(0, crc!);
+      final crcBytes = ByteData(4)
+        ..setUint32(0, crc!);
       result.addAll(crcBytes.buffer.asUint8List());
     }
     return Uint8List.fromList(result);
@@ -101,6 +129,32 @@ class TrezorPackageV2 extends TrezorPackage {
     this.crc,
   }) : super(payload);
 
+}
+
+class TrezorPackageV1 extends TrezorPackage {
+  const TrezorPackageV1(
+      {required this.length, required this.messageType, required Uint8List payload})
+      : super(payload);
+
+  @override
+  bool get needsContinuationPacket => payload.length < length;
+
+  @override
+  final int length;
+
+  final int messageType;
+
+  @override
+  Uint8List asUint8List() {
+    final writer = ByteDataWriter()
+      ..writeUint8(v1MessageMagicHeaderByte)
+      ..write([v1MessageHeaderByte, v1MessageHeaderByte])
+      ..writeUint16(messageType)
+      ..writeUint32(length)
+      ..write(payload);
+
+    return writer.toBytes();
+  }
 }
 
 class TrezorContinuationPacketPackageV1 extends TrezorPackage {
@@ -123,7 +177,7 @@ abstract class TrezorPackage {
 
   bool get needsContinuationPacket => false;
 
-  Uint8List asUint8List() => Uint8List(0);
+  Uint8List asUint8List() => payload;
 
   const TrezorPackage(this.payload);
 }
