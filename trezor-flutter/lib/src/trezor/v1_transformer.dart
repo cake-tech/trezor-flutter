@@ -23,6 +23,6 @@ class V1Transformer extends TrezorTransformer {
     }
 
 
-    return payload;
+    return bytes;
   }
 }
