@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
+import 'package:trezor_flutter/src/connect/trezor_client.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/coins/messages-monero.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/utils/bip32_path.dart';
@@ -41,10 +41,9 @@ class MoneroExportedKeyImage {
 
 class TrezorMonero {
   final String accountDerivationPath;
-  final TrezorConnection connection;
-  final ThpState state;
+  final TrezorClient _client;
 
-  const TrezorMonero(this.connection, this.state, {this.accountDerivationPath = "m/44'/128'/0'"});
+  const TrezorMonero(this._client, {this.accountDerivationPath = "m/44'/128'/0'"});
 
   List<int> get _addressN => BIPPath.fromString(accountDerivationPath).toPathArray();
 
@@ -52,8 +51,8 @@ class TrezorMonero {
     final message =
         MoneroGetAddress(addressN: _addressN, showDisplay: showDisplay, chunkify: chunkify);
 
-    final res = await _call(message.writeToBuffer(), TrezorMessageType.moneroGetAddress);
-    final result = MoneroAddress.fromBuffer(res);
+    final res = await _client.call(message.writeToBuffer(), TrezorMessageType.moneroGetAddress);
+    final result = MoneroAddress.fromBuffer(res.$2);
 
     return utf8.decode(result.address);
   }
@@ -61,8 +60,8 @@ class TrezorMonero {
   Future<(String, String)> getWatchCredentials() async {
     final message = MoneroGetWatchKey(addressN: _addressN);
 
-    final res = await _call(message.writeToBuffer(), TrezorMessageType.moneroGetWatchKey);
-    final result = MoneroWatchKey.fromBuffer(res);
+    final res = await _client.call(message.writeToBuffer(), TrezorMessageType.moneroGetWatchKey);
+    final result = MoneroWatchKey.fromBuffer(res.$2);
 
     return (hex.encode(result.watchKey), utf8.decode(result.address));
   }
@@ -70,13 +69,5 @@ class TrezorMonero {
   Future<MoneroKeyImageResponse> syncKeyImages(
       TrezorConnection connection, ThpState state, List<MoneroKeyImageTxData> txIds) async {
     throw UnimplementedError();
-  }
-
-  Future<Uint8List> _call(Uint8List message, TrezorMessageType messageType) async {
-    if (connection.device.deviceInfo.usesThp) {
-      return (await thpCall(connection, state, message, TrezorMessageType.moneroGetWatchKey)).$2;
-    }
-
-    return v1Call(connection, message, TrezorMessageType.moneroGetWatchKey);
   }
 }

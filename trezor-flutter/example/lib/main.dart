@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
-bool usbMode = false;
-bool useV1 = false;
+bool usbMode = true;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -108,26 +107,26 @@ class _HomePageState extends State<HomePage> {
 
                 print("connected!");
 
-                if (!useV1) {
-                  Future<String> onCodePin() async {
-                    final res = await showDialog<String>(
-                      context: context,
-                      builder: (context) => PinPopup(),
-                    );
-                    if (res == null) throw Exception();
-                    return res;
-                  }
-
-                  await getThpChannel(
-                    connection,
-                    state,
-                    appName: "Cake Tech",
-                    hostName: "Cake Wallet Dev Phone",
-                    onCodeCode: onCodePin,
+                Future<String> onCodePin() async {
+                  final res = await showDialog<String>(
+                    context: context,
+                    builder: (context) => PinPopup(),
                   );
+                  if (res == null) throw Exception();
+                  return res;
                 }
 
-                final monAddress = await TrezorMonero(connection, state).getWatchCredentials();
+                final client = TrezorClient.getClientForConnection(
+                  connection,
+                  state,
+                  "Cake Tech",
+                  "Cake Wallet Dev Phone",
+                  onCodePin,
+                );
+
+                await client.createChannel();
+
+                final monAddress = await TrezorMonero(client).getWatchCredentials();
                 setState(() => moneroAddress = monAddress.$2);
               },
             ),
