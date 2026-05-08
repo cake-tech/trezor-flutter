@@ -1,4 +1,8 @@
 import 'package:trezor_flutter/src/connect/pairing.dart';
+import 'package:trezor_flutter/src/operations/trezor/thp_ack_operation.dart';
+import 'package:trezor_flutter/src/operations/trezor/thp_handshake_completion_operation.dart';
+import 'package:trezor_flutter/src/operations/trezor/thp_handshake_init_operation.dart';
+import 'package:trezor_flutter/src/utils/curve25519.dart';
 import 'package:trezor_flutter/src/utils/random_bytes.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
@@ -39,8 +43,6 @@ Future<void> thpHandshake(TrezorConnection connection, ThpState state) async {
         hostPubkey: cred.hostEncryptedStaticPubkey, encryptedPayload: cred.encryptedPayload),
   );
   state.updateSyncBit(true);
-
-  print(requiresParing == 0);
 
   state.isPaired = requiresParing != 0;
   state.phase = ThpPhase.pairing;

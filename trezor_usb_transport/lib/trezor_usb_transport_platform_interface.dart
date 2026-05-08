@@ -11,13 +11,13 @@ abstract class TrezorUsbPlatform extends PlatformInterface {
 
   static TrezorUsbPlatform _instance = createPlatformInstance();
 
-  /// The default instance of [LedgerUsbPlatform] to use.
+  /// The default instance of [TrezorUsbPlatform] to use.
   ///
-  /// Defaults to [MethodChannelLedgerUsb] or [WebLedgerUsb] if running on web.
+  /// Defaults to [MethodChannelTrezorUsb]
   static TrezorUsbPlatform get instance => _instance;
 
   /// Platform-specific implementations should set this with their own
-  /// platform-specific class that extends [LedgerUsbPlatform] when
+  /// platform-specific class that extends [TrezorUsbPlatform] when
   /// they register themselves.
   static set instance(TrezorUsbPlatform instance) {
     PlatformInterface.verifyToken(instance, _token);

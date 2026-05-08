@@ -22,6 +22,7 @@ enum TrezorDeviceType {
     writeCharacteristicKey: '8c000002-a59b-4d58-a9ad-073df69fa1b1',
     notifyCharacteristicKey: '8c000003-a59b-4d58-a9ad-073df69fa1b1',
     pushCharacteristicKey: '8c000004-a59b-4d58-a9ad-073df69fa1b1',
+    usesThp: true,
   );
 
   static List<TrezorDeviceType> get ble =>
@@ -34,6 +35,7 @@ enum TrezorDeviceType {
     this.writeCharacteristicKey = "",
     this.notifyCharacteristicKey = "",
     this.pushCharacteristicKey = "",
+    this.usesThp = false,
   });
 
   final String serviceId;
@@ -42,4 +44,5 @@ enum TrezorDeviceType {
   final String pushCharacteristicKey;
   final bool usbOnly;
   final int productIdMM;
+  final bool usesThp;
 }

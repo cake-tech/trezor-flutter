@@ -16,7 +16,7 @@ class TrezorExceptionUtils {
     if (message == "connectionLost") {
       return ConnectionLostException(connectionType: connectionType);
     }
-    return LedgerDeviceException(
+    return TrezorDeviceException(
       errorCode: errorCode,
       message: message,
       cause: exception,

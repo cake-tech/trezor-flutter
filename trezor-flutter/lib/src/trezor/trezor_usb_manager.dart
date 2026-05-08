@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
-import 'package:trezor_flutter/src/models/connection_type.dart';
-import 'package:trezor_flutter/src/models/trezor_device.dart';
+import 'package:trezor_flutter/src/operations/trezor/thp_ack_operation.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/trezor/protocol/decoder.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
@@ -11,7 +10,6 @@ import 'package:trezor_flutter/src/utils/exception_utils.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 import 'package:trezor_usb_transport/trezor_usb_transport.dart';
 import 'package:trezor_usb_transport/usb_device.dart';
-import 'package:universal_ble/universal_ble.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 import '../api/api.dart';
@@ -102,8 +100,8 @@ class TrezorUsbManager extends ConnectionManager {
     if (_disposed) throw TrezorManagerDisposedException(connectionType);
 
     try {
-      final ledgerUsbDevices = await _usbTransport.listDevices();
-      return ledgerUsbDevices.map(TrezorDevice.usb).toList();
+      final usbDevices = await _usbTransport.listDevices();
+      return usbDevices.map(TrezorDevice.usb).toList();
     } on PlatformException catch (ex) {
       throw TrezorExceptionUtils.fromPlatformException(ex, connectionType);
     }

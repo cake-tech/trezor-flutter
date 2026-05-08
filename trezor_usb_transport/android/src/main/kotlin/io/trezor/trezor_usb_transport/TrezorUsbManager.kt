@@ -26,7 +26,7 @@ class TrezorUsbManager {
     /**
      * Open a new usb connection with the specified device.
      *
-     * @param identifier The id of the Ledger device.
+     * @param identifier The id of the Trezor device.
      * @throws TrezorException If unable to open a connection with the device.
      */
     @Throws(TrezorException::class)
@@ -145,7 +145,7 @@ class TrezorUsbManager {
     }
 
     /**
-     * Close the current connection with the Ledger device.
+     * Close the current connection with the Trezor device.
      */
     fun close() {
         if (connection == null) return

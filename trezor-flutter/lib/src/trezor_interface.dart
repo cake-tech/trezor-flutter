@@ -1,7 +1,7 @@
 import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
+import 'package:trezor_flutter/src/models/bluetooth_options.dart';
 import 'package:trezor_flutter/src/trezor/trezor_ble_manager.dart';
 import 'package:trezor_flutter/src/trezor/trezor_ble_search_manager.dart';
-import 'package:trezor_flutter/src/models/bluetooth_options.dart';
 import 'package:trezor_flutter/src/trezor/trezor_usb_manager.dart';
 import 'package:trezor_flutter/src/trezor_connection.dart';
 import 'package:trezor_flutter/src/utils/cancel_stream_transformer.dart';
@@ -47,13 +47,9 @@ sealed class TrezorInterface {
     }
     await _connectionManager.connect(device);
 
-    return TrezorConnection(
-      _connectionManager,
-      device,
-    );
+    return TrezorConnection(_connectionManager, device);
   }
 
-  // This will also dispose the Connected Ledger Device(s)
   Future<void> dispose({Function? onError}) async {
     switch (_connectionManager.connectionType) {
       case ConnectionType.usb:
@@ -66,7 +62,7 @@ sealed class TrezorInterface {
 
     try {
       await stopScanning();
-    } catch (ex) {
+    } catch (_) {
       // no-op
     }
 
@@ -74,23 +70,18 @@ sealed class TrezorInterface {
       await _connectionManager.dispose();
     } catch (ex) {
       onError?.call(
-        DisposeException(
-          connectionType: _connectionManager.connectionType,
-          cause: ex,
-        ),
+        DisposeException(connectionType: _connectionManager.connectionType, cause: ex),
       );
     }
   }
 
   Future<AvailabilityState> get status => _connectionManager.status;
 
-  Stream<AvailabilityState> get statusStateChanges =>
-      _connectionManager.statusStateChanges;
+  Stream<AvailabilityState> get statusStateChanges => _connectionManager.statusStateChanges;
 
   Future<List<TrezorDevice>> get devices async => _connectionManager.devices;
 
-  Stream<BleConnectionState> get deviceStateChanges =>
-      _connectionManager.deviceStateChanges;
+  Stream<BleConnectionState> get deviceStateChanges => _connectionManager.deviceStateChanges;
 }
 
 class _TrezorBle extends TrezorInterface {
@@ -104,16 +95,10 @@ class _TrezorBle extends TrezorInterface {
           options: bleOptions,
           onPermissionRequest: onPermissionRequest,
         ),
-        super(
-          TrezorBleConnectionManager(
-            onPermissionRequest: onPermissionRequest,
-          ),
-        );
+        super(TrezorBleConnectionManager(onPermissionRequest: onPermissionRequest));
 
   @override
-  Stream<TrezorDevice> scan() => _bleSearchManager //
-      .scan()
-      .onCancel(() => stopScanning());
+  Stream<TrezorDevice> scan() => _bleSearchManager.scan().onCancel(() => stopScanning());
 
   @override
   Future<void> stopScanning() => _bleSearchManager.stop();
@@ -123,11 +108,8 @@ class _TrezorUSB extends TrezorInterface {
   _TrezorUSB() : super(TrezorUsbManager());
 
   @override
-  Stream<TrezorDevice> scan() =>
-      Stream.fromFuture(devices).expand((element) => element);
+  Stream<TrezorDevice> scan() => Stream.fromFuture(devices).expand((element) => element);
 
   @override
-  Future<void> stopScanning() async {
-    // NO-OP for USB
-  }
+  Future<void> stopScanning() async {} // NO-OP for USB
 }

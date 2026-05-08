@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
-bool usbMode = true;
+bool usbMode = false;
 bool useV1 = false;
 
 void main() {
@@ -127,8 +127,8 @@ class _HomePageState extends State<HomePage> {
                   );
                 }
 
-                final monAddress = await moneroTest(connection, state, useV1);
-                setState(() => moneroAddress = monAddress);
+                final monAddress = await TrezorMonero(connection, state).getWatchCredentials();
+                setState(() => moneroAddress = monAddress.$2);
               },
             ),
           ),

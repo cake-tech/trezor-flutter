@@ -105,13 +105,13 @@ class ServiceNotSupportedException extends TrezorException {
   String toString() => "$runtimeType($connectionType, $message)\n$nestedError";
 }
 
-class LedgerDeviceException extends TrezorException {
+class TrezorDeviceException extends TrezorException {
   final String message;
   final Object? cause;
   final int errorCode;
   final ConnectionType connectionType;
 
-  LedgerDeviceException({
+  TrezorDeviceException({
     this.message = "",
     this.cause,
     this.errorCode = 0x6F00,

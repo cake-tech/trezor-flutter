@@ -1,5 +1,6 @@
 import 'package:trezor_flutter/src/connect/handshake.dart';
 import 'package:trezor_flutter/src/connect/pairing.dart';
+import 'package:trezor_flutter/src/operations/trezor/thp_create_channel_operation.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
 Future<void> createThpChannel(TrezorConnection connection, ThpState state) async {

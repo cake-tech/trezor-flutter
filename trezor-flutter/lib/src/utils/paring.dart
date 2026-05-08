@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import "package:pointycastle/export.dart";
+import 'package:trezor_flutter/src/utils/curve25519.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
 import 'package:trezor_flutter/src/utils/random_bytes.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
