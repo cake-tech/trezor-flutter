@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:trezor_flutter/src/connect/coins/monero/sign_transaction.dart';
 import 'package:trezor_flutter/src/connect/trezor_client.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/coins/messages-monero.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
@@ -7,10 +8,12 @@ import 'package:trezor_flutter/src/utils/bip32_path.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
+import 'monero/sync_keyimages.dart';
+
 class MoneroKeyImageTxData {
   final String outKey;
   final String txPubKey;
-  final String additionalTxPubKeys;
+  final List<String> additionalTxPubKeys;
   final int internalOutputIndex;
   final int subAddrMajor;
   final int subAddrMinor;
@@ -25,20 +28,6 @@ class MoneroKeyImageTxData {
   });
 }
 
-class MoneroKeyImageResponse{
-  final List<MoneroExportedKeyImage> keyImages;
-  final String signature;
-
-  const MoneroKeyImageResponse(this.keyImages, this.signature);
-}
-
-class MoneroExportedKeyImage {
-  final String iv;
-  final String keyImage;
-
-  const MoneroExportedKeyImage(this.iv, this.keyImage);
-}
-
 class TrezorMonero {
   final String accountDerivationPath;
   final TrezorClient _client;
@@ -48,26 +37,36 @@ class TrezorMonero {
   List<int> get _addressN => BIPPath.fromString(accountDerivationPath).toPathArray();
 
   Future<String> getAddress({bool showDisplay = true, bool chunkify = true}) async {
-    final message =
-        MoneroGetAddress(addressN: _addressN, showDisplay: showDisplay, chunkify: chunkify);
-
-    final res = await _client.call(message.writeToBuffer(), TrezorMessageType.moneroGetAddress);
+    final res = await _client.call(
+      MoneroGetAddress(
+        addressN: _addressN,
+        showDisplay: showDisplay,
+        chunkify: chunkify,
+      ).writeToBuffer(),
+      TrezorMessageType.moneroGetAddress,
+    );
     final result = MoneroAddress.fromBuffer(res.$2);
 
     return utf8.decode(result.address);
   }
 
   Future<(String, String)> getWatchCredentials() async {
-    final message = MoneroGetWatchKey(addressN: _addressN);
-
-    final res = await _client.call(message.writeToBuffer(), TrezorMessageType.moneroGetWatchKey);
+    final res = await _client.call(
+      MoneroGetWatchKey(addressN: _addressN).writeToBuffer(),
+      TrezorMessageType.moneroGetWatchKey,
+    );
     final result = MoneroWatchKey.fromBuffer(res.$2);
 
     return (hex.encode(result.watchKey), utf8.decode(result.address));
   }
 
-  Future<MoneroKeyImageResponse> syncKeyImages(
-      TrezorConnection connection, ThpState state, List<MoneroKeyImageTxData> txIds) async {
-    throw UnimplementedError();
-  }
+  Future<MoneroKeyImageResponse> syncKeyImages(List<MoneroKeyImageTxData> tdis) =>
+      moneroSyncKeyImages(_client, tdis: tdis, addressN: _addressN);
+
+  Future<Map> signTransaction(
+          int version,
+          MoneroTransactionInitRequest_MoneroTransactionData tsxData,
+          List<MoneroTransactionSourceEntry> inputs) =>
+      moneroSignTransaction(_client,
+          version: version, addressN: _addressN, tsxData: tsxData, inputs: inputs);
 }

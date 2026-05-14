@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:trezor_flutter/src/trezor/protobuf/messages-thp.pb.dart';
@@ -75,9 +76,53 @@ class ThpCredentials {
     required this.hostStaticKey,
     required this.autoconnect,
   });
+
+  factory ThpCredentials.fromJson(Map<String, dynamic> json) => ThpCredentials(
+        trezorStaticPublicKey: json["trezorStaticPublicKey"],
+        credential: json["credential"],
+        hostStaticKey: json["hostStaticKey"],
+        autoconnect: json["autoconnect"],
+      );
+
+  Map<String, dynamic> toMap() => {
+        "trezorStaticPublicKey": trezorStaticPublicKey,
+        "credential": credential,
+        "hostStaticKey": hostStaticKey,
+        "autoconnect": autoconnect
+      };
 }
 
 class ThpState {
+  ThpState();
+
+  factory ThpState.fromJson(String jsonString) {
+    final state = ThpState();
+    final stateMap = jsonDecode(jsonString) as Map<String, dynamic>;
+
+    if (stateMap.containsKey("properties")) {
+      state.properties = ThpDeviceProperties.fromJson(jsonEncode(stateMap["properties"]));
+    }
+
+    if (stateMap.containsKey("credentials")) {
+      state.setPairingCredentials(
+          (stateMap["credentials"] as List).map((e) => ThpCredentials.fromJson(e)).toList());
+    }
+
+    if (stateMap.containsKey("channel")) state.channel = stateMap["channel"];
+
+    state.initBitsAndNonces(
+      sendBit: stateMap["sendBit"],
+      recvBit: stateMap["recvBit"],
+      sendAckBit: stateMap["sendAckBit"],
+      recvAckBit: stateMap["recvAckBit"],
+      sendNonce: 0,
+      recvNonce: 1,
+      piggybackAckEnabled: stateMap["piggybackAckEnabled"],
+    );
+
+    return state;
+  }
+
   ThpDeviceProperties? _properties;
 
   ThpDeviceProperties? get properties => _properties;
@@ -241,4 +286,37 @@ class ThpState {
   bool get piggybackAckEnabled => _piggybackAckEnabled;
 
   Uint8List recentMessage = Uint8List(0);
+
+  void initBitsAndNonces({
+    required int sendBit,
+    required int recvBit,
+    required int sendAckBit,
+    required int recvAckBit,
+    required int sendNonce,
+    required int recvNonce,
+    required bool piggybackAckEnabled,
+  }) {
+    _sendBit = sendBit;
+    _recvBit = recvBit;
+    _sendAckBit = sendAckBit;
+    _recvAckBit = recvAckBit;
+    _sendNonce = sendNonce;
+    _recvNonce = recvNonce;
+    _piggybackAckEnabled = piggybackAckEnabled;
+  }
+
+  Map<String, dynamic> toMap() => {
+        "properties": properties?.writeToJsonMap(),
+        "credentials": pairingCredentials.map((e) => e.toMap()).toList(),
+        "channel": channel,
+        "sendBit": sendBit,
+        "recvBit": recvBit,
+        "sendAckBit": sendAckBit,
+        "recvAckBit": recvAckBit,
+        "sendNonce": sendNonce,
+        "recvNonce": recvNonce,
+        "piggybackAckEnabled": _piggybackAckEnabled,
+      };
+
+  String toJsonString() => jsonEncode(toMap());
 }

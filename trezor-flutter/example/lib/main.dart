@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
+import 'monero_tx.dart';
+
 bool usbMode = true;
 
 void main() {
@@ -126,8 +128,27 @@ class _HomePageState extends State<HomePage> {
 
                 await client.createChannel();
 
-                final monAddress = await TrezorMonero(client).getWatchCredentials();
+                final monero = TrezorMonero(client);
+                final monAddress = await monero.getWatchCredentials();
                 setState(() => moneroAddress = monAddress.$2);
+
+                final tdis = [
+                  MoneroKeyImageTxData(
+                    outKey: "692ba778e483a95c928ae03993af50fc0913856f23a695763f8bd4a6ef55ba94",
+                    txPubKey: "8c25ea48addbb1734ad64b77b95e0ce5f09b6993074fc3f0db16d011c3689ca1",
+                    additionalTxPubKeys: [],
+                    internalOutputIndex: 0,
+                    subAddrMajor: 0,
+                    subAddrMinor: 0,
+                  ),
+                ];
+
+                final res = await monero.syncKeyImages(tdis);
+                print(res.toMap());
+                
+                final res2 = await monero.signTransaction(0, dummyTsxData(), dummyInputs());
+                print(res2);
+
               },
             ),
           ),
@@ -138,6 +159,16 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton(onPressed: clearList, child: Text("Clear List")),
+              TextButton(onPressed: () => print(state.toJsonString()), child: Text("print State")),
+              TextButton(
+                onPressed: () {
+                  final std = ThpState.fromJson(
+                    '{"properties":{"1":"T3W1","2":1,"3":2,"4":0,"5":[2]},"credentials":[{"trezorStaticPublicKey":"8b6ace3e9ba34c14ea3e12abecaa89b228aab5ef225d47cb957d5815a9d6ad79","credential":"0a240a1543616b652057616c6c6574204465762050686f6e6510001a0943616b65205465636812202561d829ace53b264d04947b17a65ed82b44d08415832f2337072530853c18a7","hostStaticKey":"a9386a331f62eb667749ae70d75fcf8d40e5a7d318bb361836d176d11bd69ecc","autoconnect":false}],"channel":42934,"sendBit":0,"recvBit":0,"sendAckBit":0,"recvAckBit":1,"sendNonce":14,"recvNonce":15,"piggybackAckEnabled":false}',
+                  );
+                  setState(() => state = std);
+                },
+                child: Text("Load State"),
+              ),
               TextButton(
                 onPressed: () => setState(() => state = ThpState()),
                 child: Text("Reset State"),

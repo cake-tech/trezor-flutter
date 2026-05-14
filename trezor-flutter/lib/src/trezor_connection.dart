@@ -2,7 +2,7 @@ import 'package:trezor_flutter/src/concurrency/request_queue.dart';
 import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/models/connection_type.dart';
 import 'package:trezor_flutter/src/models/trezor_device.dart';
-import 'package:trezor_flutter/src/trezor/crc_validator_transformer.dart';
+import 'package:trezor_flutter/src/trezor/transformer/crc_validator_transformer.dart';
 
 import 'api/api.dart';
 import 'operations/trezor_operations.dart';

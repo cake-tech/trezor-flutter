@@ -28,6 +28,21 @@ class CrcValidator extends TrezorTransformer {
     final calculatedCrc = CRC32.compute(writer.toBytes());
     if (calculatedCrc != expectedCrc) throw Exception("Crc Missmatch");
 
+    if (controlByteRaw == THPControlByte.error.byte) {
+      switch (payload.first) {
+        case 0x01:
+          return throw Exception("ThpTransportBusy");
+        case 0x02:
+          return throw Exception("ThpUnallocatedChannel");
+        case 0x03:
+          return throw Exception("ThpDecryptionFailed");
+        case 0x05:
+          return throw Exception("ThpDeviceLocked");
+        default:
+          return throw Exception("ThpUnknownError $payload");
+      }
+    }
+
     return bytes;
   }
 }

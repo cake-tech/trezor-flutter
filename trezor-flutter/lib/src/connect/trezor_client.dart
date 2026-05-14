@@ -7,7 +7,7 @@ import 'package:trezor_flutter/src/operations/trezor/v1_operation.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/messages-common.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/messages-management.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
-import 'package:trezor_flutter/src/trezor/v1_transformer.dart';
+import 'package:trezor_flutter/src/trezor/transformer/v1_transformer.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
 abstract class TrezorClient {
@@ -79,13 +79,12 @@ class TrezorClientV2 extends TrezorClient {
   Future<String> Function() onPinCode;
   List<int>? sessionId;
 
-  TrezorClientV2(
-    super.connection,
-    this.state, {
-    required this.onPinCode,
-    required this.appName,
-    required this.hostName,
-  });
+  TrezorClientV2(super.connection,
+      this.state, {
+        required this.onPinCode,
+        required this.appName,
+        required this.hostName,
+      });
 
   @override
   Future<(int, Uint8List)> call(Uint8List message, TrezorMessageType messageType) async {
@@ -95,7 +94,8 @@ class TrezorClientV2 extends TrezorClient {
   }
 
   @override
-  Future<void> createChannel() => getThpChannel(
+  Future<void> createChannel() =>
+      getThpChannel(
         connection,
         state,
         appName: appName,

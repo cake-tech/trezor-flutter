@@ -130,7 +130,7 @@ class TrezorGattGateway extends GattGateway {
 
         
         if (seenPackages.contains(hex.encode(rawData))) {
-          print("duplicate package ignored");
+          print("duplicate package ignored: ${hex.encode(rawData)}");
           return;
         }
 

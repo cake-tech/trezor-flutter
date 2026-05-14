@@ -37,7 +37,7 @@ class TrezorDevice {
         connectionType: ConnectionType.usb,
         deviceInfo: TrezorDeviceType.values.firstWhere(
           (e) => device.productId >> 8 == e.productIdMM,
-          orElse: () => TrezorDeviceType.safe5,
+          orElse: () => TrezorDeviceType.safe7,
         ),
       );
 
