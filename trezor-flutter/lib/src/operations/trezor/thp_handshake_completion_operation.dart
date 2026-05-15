@@ -18,7 +18,7 @@ class TrezorThpHandshakeCompletionOperation extends TrezorTHPOperation<int> {
       {required this.hostPubkey, required this.encryptedPayload});
 
   @override
-  Future<List<Uint8List>> write(ByteDataWriter writer) async {
+  Future<Uint8List> write(ByteDataWriter writer) async {
     final payloadWriter = ByteDataWriter()
       ..write(hostPubkey)
       ..write(encryptedPayload);
@@ -32,7 +32,7 @@ class TrezorThpHandshakeCompletionOperation extends TrezorTHPOperation<int> {
 
     writeCrc32(writer);
 
-    return [writer.toBytes()];
+    return writer.toBytes();
   }
 
   @override

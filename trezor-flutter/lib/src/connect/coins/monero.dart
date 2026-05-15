@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:trezor_flutter/src/connect/coins/monero/extensions.dart';
 import 'package:trezor_flutter/src/connect/coins/monero/sign_transaction.dart';
 import 'package:trezor_flutter/src/connect/trezor_client.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/coins/messages-monero.pb.dart';
@@ -63,10 +64,11 @@ class TrezorMonero {
   Future<MoneroKeyImageResponse> syncKeyImages(List<MoneroKeyImageTxData> tdis) =>
       moneroSyncKeyImages(_client, tdis: tdis, addressN: _addressN);
 
-  Future<Map> signTransaction(
-          int version,
-          MoneroTransactionInitRequest_MoneroTransactionData tsxData,
-          List<MoneroTransactionSourceEntry> inputs) =>
-      moneroSignTransaction(_client,
-          version: version, addressN: _addressN, tsxData: tsxData, inputs: inputs);
+  Future<Map> signTransaction(Map<String, dynamic> tx) => moneroSignTransaction(
+        _client,
+        version: 0,
+        addressN: _addressN,
+        tsxData: moneroTransactionDataFromMap(tx["tsx_data"] as Map<String, dynamic>),
+        inputs: (tx["inputs"] as List).map((e) => moneroTransactionSourceEntryFromMap(e)).toList(),
+      );
 }

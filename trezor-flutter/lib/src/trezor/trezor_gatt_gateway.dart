@@ -8,6 +8,7 @@ import 'package:trezor_flutter/src/models/discovered_device.dart';
 import 'package:trezor_flutter/src/operations/trezor/thp_ack_operation.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
+import 'package:trezor_flutter/src/trezor/protocol/decoder.dart';
 import 'package:trezor_flutter/src/trezor/trezor_packer.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
@@ -149,9 +150,23 @@ class TrezorGattGateway extends GattGateway {
 
         try {
           final request = _pendingOperations.first;
+          seenPackages.add(hex.encode(rawData));
 
-          final data = rawData;
+          if (request.decodedPackage == null) {
+            request.decodedPackage = TrezorDecoder.decodePackage(rawData);
 
+            if (request.decodedPackage!.needsContinuationPacket) return;
+          }
+
+          if (request.decodedPackage!.needsContinuationPacket) {
+            final continuationPacket = TrezorDecoder.decodePackage(rawData);
+
+            request.decodedPackage =
+                TrezorDecoder.reconstructV2Payload([request.decodedPackage!, continuationPacket]);
+            if (request.decodedPackage!.needsContinuationPacket) return;
+          }
+
+          final data = request.decodedPackage!.asUint8List();
           final transformer = request.transformer;
           final reader = ByteDataReader();
           if (transformer != null) {
@@ -165,7 +180,6 @@ class TrezorGattGateway extends GattGateway {
 
           _pendingOperations.removeFirst();
           request.completer.complete(response);
-          seenPackages.add(hex.encode(data));
         } catch (ex) {
           _handleOnError(ex);
           _onError?.call(ex);
@@ -207,12 +221,13 @@ class TrezorGattGateway extends GattGateway {
 
     final writer = ByteDataWriter();
     final output = await operation.write(writer);
-    for (final payload in output) {
+    final payloads = _packer.pack(output, 244);
+    for (final payload in payloads) {
       await UniversalBle.write(
         trezor.device.id,
         trezor.device.deviceInfo.serviceId,
         characteristicWrite!.uuid,
-        _packer.pack(payload, 244),
+        payload,
         withoutResponse: false,
         timeout: _bleWriteTimeout,
       );
@@ -311,6 +326,7 @@ class _Request {
   final TrezorOperation operation;
   final TrezorTransformer? transformer;
   final Completer completer;
+  TrezorPackage? decodedPackage;
 
   final Map<int, Uint8List> _partialData = {};
   int _expectedDataLength = -1; // read from packet 0

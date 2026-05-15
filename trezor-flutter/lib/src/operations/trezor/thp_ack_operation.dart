@@ -16,7 +16,7 @@ class TrezorThpAckOperation extends TrezorTHPOperation<void> {
   // [magic | channel | len  | crc     ]
   // [20    | 1234    | 0004 | d9fcce58]
   @override
-  Future<List<Uint8List>> write(ByteDataWriter writer) async {
+  Future<Uint8List> write(ByteDataWriter writer) async {
     writer
       ..write(addAckBit(THPControlByte.ackMessage.byte, state.recvAckBit))
       ..writeUint16(state.channel)
@@ -24,7 +24,7 @@ class TrezorThpAckOperation extends TrezorTHPOperation<void> {
 
     writeCrc32(writer);
 
-    return [writer.toBytes()];
+    return writer.toBytes();
   }
 
   @override

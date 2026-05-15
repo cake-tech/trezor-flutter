@@ -12,7 +12,7 @@ class TrezorPingOperation extends TrezorTHPOperation<Uint8List> {
   TrezorPingOperation(this.state);
 
   @override
-  Future<List<Uint8List>> write(ByteDataWriter writer) async {
+  Future<Uint8List> write(ByteDataWriter writer) async {
     writer
       ..writeUint8(THPControlByte.ping.byte)
       ..writeUint16(0xFFFF)
@@ -20,7 +20,7 @@ class TrezorPingOperation extends TrezorTHPOperation<Uint8List> {
 
     writeCrc32(writer);
 
-    return [writer.toBytes()];
+    return writer.toBytes();
   }
 
   @override

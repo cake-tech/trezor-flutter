@@ -1,5 +1,4 @@
-import 'package:trezor_flutter/src/connect/coins/monero/extensions.dart';
-import 'package:trezor_flutter/src/trezor/protobuf/coins/messages-monero.pb.dart';
+import 'package:trezor_flutter/trezor_flutter.dart';
 
 final tx = {
   "path": "m/44'/128'/0'",
@@ -182,5 +181,13 @@ final tx = {
   ],
 };
 
-MoneroTransactionInitRequest_MoneroTransactionData dummyTsxData() => moneroTransactionDataFromMap(tx["tsx_data"] as Map<String, dynamic>);
-List<MoneroTransactionSourceEntry> dummyInputs() => (tx["inputs"] as List).map((e) => moneroTransactionSourceEntryFromMap(e)).toList();
+final tdis = [
+  MoneroKeyImageTxData(
+    outKey: "692ba778e483a95c928ae03993af50fc0913856f23a695763f8bd4a6ef55ba94",
+    txPubKey: "8c25ea48addbb1734ad64b77b95e0ce5f09b6993074fc3f0db16d011c3689ca1",
+    additionalTxPubKeys: [],
+    internalOutputIndex: 0,
+    subAddrMajor: 0,
+    subAddrMinor: 0,
+  ),
+];

@@ -8,7 +8,7 @@ import 'package:trezor_flutter/src/utils/buffer.dart';
 abstract class TrezorOperation<T> {
   int get protocolVersion => 2;
 
-  Future<List<Uint8List>> write(ByteDataWriter writer);
+  Future<Uint8List> write(ByteDataWriter writer);
 
   Future<T> read(ByteDataReader reader);
 

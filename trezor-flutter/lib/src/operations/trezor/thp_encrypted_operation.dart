@@ -29,7 +29,7 @@ class TrezorThpEncryptedOperation extends TrezorTHPOperation<TrezorThpEncryptedR
   TrezorThpEncryptedOperation(this.state, {required this.data, required this.messageType});
 
   @override
-  Future<List<Uint8List>> write(ByteDataWriter writer) async {
+  Future<Uint8List> write(ByteDataWriter writer) async {
     writer.write(addSequenceBit(THPControlByte.encrypted.byte, state.sendBit));
 
     // Channel (0xFFFF for broadcast/allocation request)
@@ -61,7 +61,7 @@ class TrezorThpEncryptedOperation extends TrezorTHPOperation<TrezorThpEncryptedR
 
     state.sync(true, "");
 
-    return [writer.toBytes()];
+    return writer.toBytes();
   }
 
   @override

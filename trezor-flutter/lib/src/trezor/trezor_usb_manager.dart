@@ -56,14 +56,11 @@ class TrezorUsbManager extends ConnectionManager {
 
     try {
       final writer = ByteDataWriter();
-      final payloads = await operation.write(writer);
-      for (final payload in payloads) {
-        await _usbTransport.transferOut(payload);
-      }
+      final payload = await operation.write(writer);
+      await _usbTransport.transferOut(payload);
 
       final reader = ByteDataReader();
       if (operation is TrezorThpAckOperation) return operation.read(reader);
-
 
       var response = await _readResponse();
 
@@ -73,7 +70,6 @@ class TrezorUsbManager extends ConnectionManager {
           response = await _readResponse();
         }
       }
-
 
       if (transformer != null) {
         final transformed = await transformer.onTransform([response.asUint8List()]);
@@ -108,9 +104,8 @@ class TrezorUsbManager extends ConnectionManager {
   }
 
   @override
-  Future<AvailabilityState> get status async => UniversalPlatform.isIOS
-      ? AvailabilityState.unsupported
-      : AvailabilityState.poweredOn;
+  Future<AvailabilityState> get status async =>
+      UniversalPlatform.isIOS ? AvailabilityState.unsupported : AvailabilityState.poweredOn;
 
   @override
   Stream<AvailabilityState> get statusStateChanges {

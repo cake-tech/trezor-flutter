@@ -24,7 +24,7 @@ class TrezorV1Operation extends TrezorOperation<TrezorResponse> {
   int get protocolVersion => 1;
 
   @override
-  Future<List<Uint8List>> write(ByteDataWriter writer) async {
+  Future<Uint8List> write(ByteDataWriter writer) async {
     writer
       ..writeUint8(v1MessageMagicHeaderByte)
       ..writeUint8(v1MessageHeaderByte)
@@ -33,7 +33,7 @@ class TrezorV1Operation extends TrezorOperation<TrezorResponse> {
       ..writeUint32(data.length)
       ..write(data);
 
-    return [writer.toBytes()];
+    return writer.toBytes();
   }
 
   @override

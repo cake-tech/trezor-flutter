@@ -8,7 +8,7 @@ import 'package:trezor_flutter/trezor_flutter.dart';
 
 import 'monero_tx.dart';
 
-bool usbMode = true;
+bool usbMode = false;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
 
   var state = ThpState();
   String? moneroAddress;
+  TrezorMonero? monero;
 
   @override
   void initState() {
@@ -128,26 +129,10 @@ class _HomePageState extends State<HomePage> {
 
                 await client.createChannel();
 
-                final monero = TrezorMonero(client);
-                final monAddress = await monero.getWatchCredentials();
+                monero = TrezorMonero(client);
+                final monAddress = await monero!.getWatchCredentials();
                 setState(() => moneroAddress = monAddress.$2);
 
-                final tdis = [
-                  MoneroKeyImageTxData(
-                    outKey: "692ba778e483a95c928ae03993af50fc0913856f23a695763f8bd4a6ef55ba94",
-                    txPubKey: "8c25ea48addbb1734ad64b77b95e0ce5f09b6993074fc3f0db16d011c3689ca1",
-                    additionalTxPubKeys: [],
-                    internalOutputIndex: 0,
-                    subAddrMajor: 0,
-                    subAddrMinor: 0,
-                  ),
-                ];
-
-                final res = await monero.syncKeyImages(tdis);
-                print(res.toMap());
-                
-                final res2 = await monero.signTransaction(0, dummyTsxData(), dummyInputs());
-                print(res2);
 
               },
             ),
@@ -172,6 +157,25 @@ class _HomePageState extends State<HomePage> {
               TextButton(
                 onPressed: () => setState(() => state = ThpState()),
                 child: Text("Reset State"),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () async {
+                  final res = await monero!.syncKeyImages(tdis);
+                  print(res.toMap());
+                },
+                child: Text("Sync KeyImages"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final res2 = await monero!.signTransaction(tx);
+                  print(res2);
+                },
+                child: Text("Send Transaction"),
               ),
             ],
           ),

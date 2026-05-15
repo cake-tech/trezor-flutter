@@ -29,7 +29,7 @@ class TrezorThpCreateChannelOperation extends TrezorTHPOperation<ThpState> {
   }
 
   @override
-  Future<List<Uint8List>> write(ByteDataWriter writer) async {
+  Future<Uint8List> write(ByteDataWriter writer) async {
     writer..writeUint8(THPControlByte.channelAllocationReq.byte)
     ..writeUint16(0xFFFF)
     ..writeUint16(nonce.length + crcLength)
@@ -37,7 +37,7 @@ class TrezorThpCreateChannelOperation extends TrezorTHPOperation<ThpState> {
 
     writeCrc32(writer);
 
-    return [writer.toBytes()];
+    return writer.toBytes();
   }
 
   @override

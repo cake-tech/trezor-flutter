@@ -29,7 +29,7 @@ class TrezorThpHandshakeInitOperation extends TrezorTHPOperation<ThpHandshakeIni
       {required this.hostEphemeralKeyPair, this.tryToUnlock = false});
 
   @override
-  Future<List<Uint8List>> write(ByteDataWriter writer) async {
+  Future<Uint8List> write(ByteDataWriter writer) async {
     final payloadWriter = ByteDataWriter()
       ..write(hostEphemeralKeyPair.publicKey)
       ..write([tryToUnlock ? 1 : 0]);
@@ -43,7 +43,7 @@ class TrezorThpHandshakeInitOperation extends TrezorTHPOperation<ThpHandshakeIni
 
     writeCrc32(writer);
 
-    return [writer.toBytes()];
+    return writer.toBytes();
   }
 
   @override

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
@@ -11,8 +9,7 @@ class TrezorDecoder {
   static int getProtocolVersion(Uint8List bytes) => bytes.first == v1MessageMagicHeaderByte ? 1 : 2;
 
   static TrezorPackage decodePackage(Uint8List bytes) {
-    final reader = ByteDataReader()
-      ..add(bytes);
+    final reader = ByteDataReader()..add(bytes);
 
     final controlByteRaw = reader.readUint8();
 
@@ -22,13 +19,12 @@ class TrezorDecoder {
         final messageType = reader.readUint16();
         final length = reader.readUint32();
         final payload =
-        reader.read(length < reader.remainingLength ? length : reader.remainingLength);
+            reader.read(length < reader.remainingLength ? length : reader.remainingLength);
 
         return TrezorPackageV1(length: length, messageType: messageType, payload: payload);
       }
 
-      final payload =
-      reader.read(reader.remainingLength);
+      final payload = reader.read(reader.remainingLength);
 
       return TrezorContinuationPacketPackageV1(payload: payload);
     } else if (controlByteRaw == THPControlByte.continuationPacket.byte) {
@@ -67,7 +63,7 @@ class TrezorDecoder {
 
     if (payload.length >= headers!.length) {
       final crc =
-      ByteData.sublistView(Uint8List.fromList(payload)).getUint32(headers.length - crcLength);
+          ByteData.sublistView(Uint8List.fromList(payload)).getUint32(headers.length - crcLength);
 
       return TrezorPackageV2(
         headers: headers,
@@ -116,8 +112,7 @@ class TrezorPackageV2 extends TrezorPackage {
     result.addAll(payload);
 
     if (crc != null) {
-      final crcBytes = ByteData(4)
-        ..setUint32(0, crc!);
+      final crcBytes = ByteData(4)..setUint32(0, crc!);
       result.addAll(crcBytes.buffer.asUint8List());
     }
     return Uint8List.fromList(result);
@@ -128,7 +123,6 @@ class TrezorPackageV2 extends TrezorPackage {
     required Uint8List payload,
     this.crc,
   }) : super(payload);
-
 }
 
 class TrezorPackageV1 extends TrezorPackage {
