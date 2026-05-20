@@ -16,7 +16,7 @@ final tx = {
         },
         "is_subaddress": false,
         "original":
-            "47KsL3sBW8PVBmCz5H6Ncn6E2STreVqkJ8stwGaaW8uHJRfGNXXKkb9QMq7LM6czJu16JzhPGqaoKbPwihvDZpBQHrtAPF2",
+        "47KsL3sBW8PVBmCz5H6Ncn6E2STreVqkJ8stwGaaW8uHJRfGNXXKkb9QMq7LM6czJu16JzhPGqaoKbPwihvDZpBQHrtAPF2",
         "is_integrated": false,
       },
       {

@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/coins/messages-monero.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
+import 'package:trezor_flutter/src/utils/hex_utils.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
 class ProtocolState {
@@ -125,20 +126,25 @@ Future<Map> moneroSignTransaction(
   final finalResponse = MoneroTransactionFinalAck.fromBuffer(finalResponseRaw.$2);
 
   return {
-    "signatures": state.signatures,
-    "tx_prefix_hash": state.txPrefixHash,
-    "rv": state.rv,
-    "cout_key": finalResponse.coutKey,
-    "salt": finalResponse.salt,
-    "rand_mult": finalResponse.randMult,
-    "tx_enc_keys": finalResponse.txEncKeys,
-    "opening_key": finalResponse.openingKey,
-    "pseudo_outs": state.pseudoOuts,
-    "out_pks": state.outPks,
-    "ecdh_infos": state.ecdhInfos,
-    "tx_outs": state.txOuts,
-    "rsig_parts": state.rsigParts,
-    "extra": state.extra,
+    "signatures": state.signatures.map((e) => hex.encode(e)).toList(),
+    if (state.txPrefixHash != null) "tx_prefix_hash": hex.encode(state.txPrefixHash!),
+    if (state.rv != null)
+      "rv": {
+        "txn_fee": state.rv?.txnFee.toInt(),
+        "rv_type": state.rv?.rvType,
+        "message": hex.encode(state.rv!.message)
+      },
+    "cout_key": hex.encode(finalResponse.coutKey),
+    "salt": hex.encode(finalResponse.salt),
+    "rand_mult": hex.encode(finalResponse.randMult),
+    "tx_enc_keys": hex.encode(finalResponse.txEncKeys),
+    "opening_key": hex.encode(finalResponse.openingKey),
+    "pseudo_outs": state.pseudoOuts.map((e) => hex.encode(e)).toList(),
+    "out_pks": state.outPks.map((e) => hex.encode(e)).toList(),
+    "ecdh_infos": state.ecdhInfos.map((e) => hex.encode(e)).toList(),
+    "tx_outs": state.txOuts.map((e) => hex.encode(e)).toList(),
+    "rsig_parts": state.rsigParts.map((e) => hex.encode(e)).toList(),
+    if (state.extra != null) "extra": hex.encode(state.extra!),
   };
 }
 
