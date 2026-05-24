@@ -178,6 +178,7 @@ class TrezorGattGateway extends GattGateway {
 
           final response = await request.operation.read(reader);
 
+          seenPackages.clear();
           _pendingOperations.removeFirst();
           request.completer.complete(response);
         } catch (ex) {

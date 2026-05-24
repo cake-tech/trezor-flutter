@@ -1,64 +1,52 @@
-import 'package:fixnum/fixnum.dart';
+import 'package:flutter/foundation.dart';
+import 'package:pointycastle/api.dart';
+import 'package:pointycastle/digests/keccak.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/coins/messages-monero.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
+import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
+import 'package:trezor_flutter/src/utils/varint.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
-class ProtocolState {
-  List<List<int>> hmacs = [];
-  List<ProtocolState_Vinis> vinis = [];
-  List<int>? txPrefixHash;
-  MoneroTransactionAllOutSetAck_MoneroRingCtSig? rv;
-  List<List<int>> signatures = [];
-  List<List<int>> pseudoOuts = [];
-  List<List<int>> outPks = [];
-  List<List<int>> ecdhInfos = [];
-  List<List<int>> txOuts = [];
-  List<List<int>> rsigParts = [];
-  List<int>? extra;
-}
-
-Future<Map> moneroSignTransaction(
+Future<String> moneroSignTransaction(
   TrezorClient client, {
   required int version,
   required Iterable<int> addressN,
   required MoneroTransactionInitRequest_MoneroTransactionData tsxData,
   required List<MoneroTransactionSourceEntry> inputs,
 }) async {
-  final state = ProtocolState();
+  final state = _ProtocolState();
 
-  final transactionInitRequest =
-      MoneroTransactionInitRequest(version: version, addressN: addressN, tsxData: tsxData);
   final initResponseRaw = await client.call(
-      transactionInitRequest.writeToBuffer(), TrezorMessageType.moneroTransactionInitRequest);
+    MoneroTransactionInitRequest(version: version, addressN: addressN, tsxData: tsxData)
+        .writeToBuffer(),
+    TrezorMessageType.moneroTransactionInitRequest,
+  );
   final initResponse = MoneroTransactionInitAck.fromBuffer(initResponseRaw.$2);
 
   state.hmacs = initResponse.hmacs;
-  for (var i = 0; i < inputs.length; i++) {
-    final setInputRequest = MoneroTransactionSetInputRequest(srcEntr: inputs[i]);
 
+  for (var i = 0; i < inputs.length; i++) {
     final setInputResponseRaw = await client.call(
-      setInputRequest.writeToBuffer(),
+      MoneroTransactionSetInputRequest(srcEntr: inputs[i]).writeToBuffer(),
       TrezorMessageType.moneroTransactionSetInputRequest,
     );
     final setInputResponse = MoneroTransactionSetInputAck.fromBuffer(setInputResponseRaw.$2);
 
     // Store for later steps
-    state.vinis.add(ProtocolState_Vinis.fromPB(setInputResponse, i, inputs[i]));
+    state.vinis.add(_ProtocolStateVinis.fromPB(setInputResponse, i, inputs[i]));
   }
 
   for (final viniData in state.vinis) {
-    final inputViniRequest = MoneroTransactionInputViniRequest(
-      srcEntr: viniData.srcEntr,
-      vini: viniData.vini,
-      viniHmac: viniData.hmac,
-      pseudoOut: viniData.pseudoOut,
-      pseudoOutHmac: viniData.pseudoOutHmac,
-      origIdx: viniData.origIdx,
-    );
-
     await client.call(
-      inputViniRequest.writeToBuffer(),
+      MoneroTransactionInputViniRequest(
+        srcEntr: viniData.srcEntr,
+        vini: viniData.vini,
+        viniHmac: viniData.hmac,
+        pseudoOut: viniData.pseudoOut,
+        pseudoOutHmac: viniData.pseudoOutHmac,
+        origIdx: viniData.origIdx,
+      ).writeToBuffer(),
       TrezorMessageType.moneroTransactionInputViniRequest,
     );
   }
@@ -77,7 +65,9 @@ Future<Map> moneroSignTransaction(
 
     final setOutputResponse = MoneroTransactionSetOutputAck.fromBuffer(setOutputResponseRaw.$2);
 
-    state.outPks.add(setOutputResponse.outPk);
+    final outPkMask = setOutputResponse.outPk.sublist(32, 64);
+    state.outPks.add(outPkMask);
+    // state.outPks.add(setOutputResponse.outPk);
     state.ecdhInfos.add(setOutputResponse.ecdhInfo);
     state.txOuts.add(setOutputResponse.txOut);
     state.rsigParts.add(setOutputResponse.rsigData.rsig);
@@ -125,30 +115,24 @@ Future<Map> moneroSignTransaction(
   );
   final finalResponse = MoneroTransactionFinalAck.fromBuffer(finalResponseRaw.$2);
 
-  return {
-    "signatures": state.signatures.map((e) => hex.encode(e)).toList(),
-    if (state.txPrefixHash != null) "tx_prefix_hash": hex.encode(state.txPrefixHash!),
-    if (state.rv != null)
-      "rv": {
-        "txn_fee": state.rv?.txnFee.toInt(),
-        "rv_type": state.rv?.rvType,
-        "message": hex.encode(state.rv!.message)
-      },
-    "cout_key": hex.encode(finalResponse.coutKey),
-    "salt": hex.encode(finalResponse.salt),
-    "rand_mult": hex.encode(finalResponse.randMult),
-    "tx_enc_keys": hex.encode(finalResponse.txEncKeys),
-    "opening_key": hex.encode(finalResponse.openingKey),
-    "pseudo_outs": state.pseudoOuts.map((e) => hex.encode(e)).toList(),
-    "out_pks": state.outPks.map((e) => hex.encode(e)).toList(),
-    "ecdh_infos": state.ecdhInfos.map((e) => hex.encode(e)).toList(),
-    "tx_outs": state.txOuts.map((e) => hex.encode(e)).toList(),
-    "rsig_parts": state.rsigParts.map((e) => hex.encode(e)).toList(),
-    if (state.extra != null) "extra": hex.encode(state.extra!),
-  };
+  return state.toMoneroTx(openingKey: finalResponse.openingKey);
 }
 
-class ProtocolState_Vinis {
+class _ProtocolState {
+  List<List<int>> hmacs = [];
+  List<_ProtocolStateVinis> vinis = [];
+  List<int>? txPrefixHash;
+  MoneroTransactionAllOutSetAck_MoneroRingCtSig? rv;
+  List<List<int>> signatures = [];
+  List<List<int>> pseudoOuts = [];
+  List<List<int>> outPks = [];
+  List<List<int>> ecdhInfos = [];
+  List<List<int>> txOuts = [];
+  List<List<int>> rsigParts = [];
+  List<int>? extra;
+}
+
+class _ProtocolStateVinis {
   final List<int> vini;
   final List<int> hmac;
   final List<int> pseudoOut;
@@ -158,7 +142,7 @@ class ProtocolState_Vinis {
   final MoneroTransactionSourceEntry srcEntr;
   final int origIdx;
 
-  const ProtocolState_Vinis({
+  const _ProtocolStateVinis({
     required this.vini,
     required this.hmac,
     required this.pseudoOut,
@@ -169,9 +153,9 @@ class ProtocolState_Vinis {
     required this.origIdx,
   });
 
-  factory ProtocolState_Vinis.fromPB(MoneroTransactionSetInputAck message, int origIdx,
+  factory _ProtocolStateVinis.fromPB(MoneroTransactionSetInputAck message, int origIdx,
           MoneroTransactionSourceEntry srcEntr) =>
-      ProtocolState_Vinis(
+      _ProtocolStateVinis(
         vini: message.vini,
         hmac: message.viniHmac,
         pseudoOut: message.pseudoOut,
@@ -183,60 +167,97 @@ class ProtocolState_Vinis {
       );
 }
 
-class TransactionData {
-  final int version;
-  final List<int> paymentId;
-  final int unlockTime;
-  final Iterable<MoneroTransactionDestinationEntry> outputs;
-  final MoneroTransactionDestinationEntry changeDts;
-  final int numInputs;
-  final int mixin;
-  final int fee;
-  final int account;
-  final Iterable<int> minorIndices;
-  final MoneroTransactionRsigData rsigData;
-  final Iterable<int> integratedIndices;
-  final int clientVersion;
-  final int hardFork;
-  final List<int> moneroVersion;
-  final bool chunkify;
+extension SerializeTx on _ProtocolState {
+  String toMoneroTx({required List<int> openingKey}) {
+    var tx = ByteDataWriter();
+    tx.write(VarInt.encodeMoneroVarint(2)); // Version
+    tx.write(VarInt.encodeMoneroVarint(0)); // unlockTime
+    tx.write(VarInt.encodeMoneroVarint(vinis.length)); // n Inputs
 
-  const TransactionData({
-    required this.version,
-    required this.paymentId,
-    required this.unlockTime,
-    required this.outputs,
-    required this.changeDts,
-    required this.numInputs,
-    required this.mixin,
-    required this.fee,
-    required this.account,
-    required this.minorIndices,
-    required this.rsigData,
-    required this.integratedIndices,
-    required this.clientVersion,
-    required this.hardFork,
-    required this.moneroVersion,
-    required this.chunkify,
-  });
+    for (final vini in vinis) {
+      tx.write(vini.vini);
+    }
 
-  MoneroTransactionInitRequest_MoneroTransactionData toPB() =>
-      MoneroTransactionInitRequest_MoneroTransactionData(
-        version: version,
-        paymentId: paymentId,
-        unlockTime: Int64(unlockTime),
-        outputs: outputs,
-        changeDts: changeDts,
-        numInputs: numInputs,
-        mixin: mixin,
-        fee: Int64(fee),
-        account: account,
-        minorIndices: minorIndices,
-        rsigData: rsigData,
-        integratedIndices: integratedIndices,
-        clientVersion: clientVersion,
-        hardFork: hardFork,
-        moneroVersion: moneroVersion,
-        chunkify: chunkify,
-      );
+    tx.write(VarInt.encodeMoneroVarint(txOuts.length)); // n Outputs
+    for (final vout in txOuts) {
+      print(hex.encode(vout));
+      tx.write(vout);
+    }
+
+    tx.write(VarInt.encodeMoneroVarint(extra!.length));
+
+    tx.write(extra!);
+
+    _verifyTransactionPrefix(computedPrefix: tx.toBytes(), expectedPrefix: txPrefixHash!);
+
+    tx.writeUint8(rv!.rvType);
+
+    tx.write(VarInt.encodeMoneroVarint(rv!.txnFee.toInt()));
+
+    for (final ecdhInfo in ecdhInfos) {
+      tx.write(ecdhInfo);
+    }
+
+    for (final outPk in outPks) {
+      tx.write(outPk);
+    }
+
+    tx.write(VarInt.encodeMoneroVarint(1)); // Todo dynamic?
+    for (final rsigPart in rsigParts) {
+      tx.write(rsigPart);
+    }
+
+    signatures.asMap().forEach((i, signature) =>
+        tx.write(_decryptChaCha(openingKey: openingKey, idx: i, input: signature).sublist(1)));
+
+    for (final pseudoOut in pseudoOuts) {
+      tx.write(pseudoOut);
+    }
+
+    return hex.encode(tx.toBytes());
+  }
+}
+
+Uint8List _computeSealingKey({
+  required List<int> key,
+  required int idx,
+  required bool isIv,
+}) {
+  final idxVarint = VarInt.encodeMoneroVarint(idx);
+  if (idxVarint.length > 4) throw ArgumentError("index is too big");
+
+  final sep = (isIv ? "sig-iv" : "sig-key").codeUnits;
+  final input = Uint8List(32 + 12 + 4)
+    ..setRange(0, 32, key)
+    ..setRange(32, 32 + sep.length, sep)
+    ..setRange(44, 44 + idxVarint.length, idxVarint);
+
+  return KeccakDigest(256).process(KeccakDigest(256).process(input));
+}
+
+Uint8List _decryptChaCha({
+  required List<int> openingKey,
+  required int idx,
+  required List<int> input,
+}) {
+  final iv = _computeSealingKey(key: openingKey, idx: idx, isIv: true).sublist(0, 12);
+  final key = _computeSealingKey(key: openingKey, idx: idx, isIv: false);
+
+  final cipher = AEADCipher("ChaCha20-Poly1305")
+    ..init(false, AEADParameters(KeyParameter(key), 128, iv, Uint8List(0)));
+
+  final output = Uint8List(cipher.getOutputSize(input.length));
+  var len = cipher.processBytes(Uint8List.fromList(input), 0, input.length, output, 0);
+  len += cipher.doFinal(output, len);
+
+  return Uint8List.sublistView(output, 0, len);
+}
+
+void _verifyTransactionPrefix({
+  required List<int> computedPrefix,
+  required List<int> expectedPrefix,
+}) {
+  final prefix = KeccakDigest(256).process(Uint8List.fromList(computedPrefix));
+
+  if (!listEquals(prefix, expectedPrefix)) throw ArgumentError("invalid transaction prefix");
 }
