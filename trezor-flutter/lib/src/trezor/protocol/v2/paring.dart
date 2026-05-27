@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:trezor_flutter/src/trezor/protobuf/messages-thp.pb.dart';
 import 'package:trezor_flutter/src/operations/trezor/thp_handshake_init_operation.dart';
 import 'package:trezor_flutter/src/trezor/crypto/aesgcm.dart';
+import 'package:trezor_flutter/src/trezor/protobuf/messages-thp.pb.dart';
 import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
 import 'package:trezor_flutter/src/utils/paring.dart';
@@ -50,8 +50,7 @@ HandshakeCredentials handleHandshakeInit({
   var [ck, k] = hkdf(getProtocolName(), point);
 
   // 6. Set trezor_masked_static_pubkey, success = AES-GCM-DECRYPT(key=k, IV=0^96 (bits, 12 bytes), ad=h, plaintext=encrypted_trezor_static_pubkey). Assert that success is True.
-  var aes = AesGcm(k, iv0);
-  aes.auth(h);
+  var aes = AesGcm(k, iv0)..auth(h);
   final trezorStaticPubkey = handshakeInitResponse.trezorEncryptedStaticPubkey.sublist(0, 32);
   final trezorStaticPubkeyTag =
       handshakeInitResponse.trezorEncryptedStaticPubkey.sublist(32, 32 + 16);
@@ -63,9 +62,9 @@ HandshakeCredentials handleHandshakeInit({
   [ck, k] = hkdf(ck, point);
 
   // 9. Set tag_of_empty_string, success = AES-GCM-DECRYPT(key=k, IV=0^96 (bits, 12 bytes), ad=h, plaintext=empty_string). Assert that success is True.
-  aes = AesGcm(k, iv0);
-  aes.auth(h);
-  aes.decrypt(Uint8List(0), handshakeInitResponse.tag);
+  aes = AesGcm(k, iv0)
+    ..auth(h)
+    ..decrypt(Uint8List(0), handshakeInitResponse.tag);
   // 10. Set h = SHA-256(h || tag)
   h = hashOfTwo(h, handshakeInitResponse.tag);
 
@@ -88,8 +87,7 @@ HandshakeCredentials handleHandshakeInit({
       : randomBytes(32);
   final hostStaticKeys = getCurve25519KeyPair(staticKey);
   // 12. Set encrypted_host_static_pubkey = AES-GCM-ENCRYPT(key=k, IV=0^95 || 1, ad=h, plaintext=temp_host_static_pubkey).
-  aes = AesGcm(k, iv1);
-  aes.auth(h);
+  aes = AesGcm(k, iv1)..auth(h);
   final hostEncryptedStaticPubkey = Uint8List.fromList([
     ...aes.encrypt(hostStaticKeys.publicKey),
     ...aes.finish(),
@@ -107,8 +105,7 @@ HandshakeCredentials handleHandshakeInit({
   );
   final message = data.writeToBuffer();
   // 16. Set *encrypted_payload* = AES-GCM-ENCRYPT(*key*=*k*, *IV*=*0^96*, *ad*=*h*, *plaintext*=*payload_binary*).
-  aes = AesGcm(k, iv0);
-  aes.auth(h);
+  aes = AesGcm(k, iv0)..auth(h);
   final encryptedPayload = Uint8List.fromList([...aes.encrypt(message), ...aes.finish()]);
   h = hashOfTwo(h, encryptedPayload);
 

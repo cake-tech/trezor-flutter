@@ -108,17 +108,17 @@ class ThpState {
           (stateMap["credentials"] as List).map((e) => ThpCredentials.fromJson(e)).toList());
     }
 
-    if (stateMap.containsKey("channel")) state.channel = stateMap["channel"];
+    // if (stateMap.containsKey("channel")) state.channel = stateMap["channel"];
 
-    state.initBitsAndNonces(
-      sendBit: stateMap["sendBit"],
-      recvBit: stateMap["recvBit"],
-      sendAckBit: stateMap["sendAckBit"],
-      recvAckBit: stateMap["recvAckBit"],
-      sendNonce: 0,
-      recvNonce: 1,
-      piggybackAckEnabled: stateMap["piggybackAckEnabled"],
-    );
+    // state.initBitsAndNonces(
+    //   sendBit: stateMap["sendBit"],
+    //   recvBit: stateMap["recvBit"],
+    //   sendAckBit: stateMap["sendAckBit"],
+    //   recvAckBit: stateMap["recvAckBit"],
+    //   sendNonce: 0,
+    //   recvNonce: 1,
+    //   piggybackAckEnabled: stateMap["piggybackAckEnabled"],
+    // );
 
     return state;
   }

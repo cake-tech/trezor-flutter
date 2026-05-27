@@ -19,7 +19,7 @@ Future<void> thpHandshake(TrezorConnection connection, ThpState state) async {
   final cred = handleHandshakeInit(
     handshakeInitResponse: res,
     thpState: state,
-    knownCredentials: [],
+    knownCredentials: state.pairingCredentials,
     hostEphemeralKeys: hostEphemeralKeyPair,
     tryToUnlock: 0,
   );

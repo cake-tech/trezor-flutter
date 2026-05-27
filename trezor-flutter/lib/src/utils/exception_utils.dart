@@ -13,9 +13,8 @@ class TrezorExceptionUtils {
     final errorCode = int.tryParse(exception.code) ?? 0;
     final message = exception.message ?? '';
 
-    if (message == "connectionLost") {
-      return ConnectionLostException(connectionType: connectionType);
-    }
+    if (message == "connectionLost") return ConnectionLostException(connectionType: connectionType);
+
     return TrezorDeviceException(
       errorCode: errorCode,
       message: message,

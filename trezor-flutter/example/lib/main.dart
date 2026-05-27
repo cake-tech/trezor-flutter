@@ -148,7 +148,7 @@ class _HomePageState extends State<HomePage> {
               TextButton(
                 onPressed: () {
                   final std = ThpState.fromJson(
-                    '{"properties":{"1":"T3W1","2":1,"3":2,"4":0,"5":[2]},"credentials":[{"trezorStaticPublicKey":"8b6ace3e9ba34c14ea3e12abecaa89b228aab5ef225d47cb957d5815a9d6ad79","credential":"0a240a1543616b652057616c6c6574204465762050686f6e6510001a0943616b65205465636812202561d829ace53b264d04947b17a65ed82b44d08415832f2337072530853c18a7","hostStaticKey":"a9386a331f62eb667749ae70d75fcf8d40e5a7d318bb361836d176d11bd69ecc","autoconnect":false}],"channel":42934,"sendBit":0,"recvBit":0,"sendAckBit":0,"recvAckBit":1,"sendNonce":14,"recvNonce":15,"piggybackAckEnabled":false}',
+                    '{"properties":{"1":"T3W1","2":1,"3":2,"4":1,"5":[2]},"credentials":[{"trezorStaticPublicKey":"8b6ace3e9ba34c14ea3e12abecaa89b228aab5ef225d47cb957d5815a9d6ad79","credential":"0a240a1543616b652057616c6c6574204465762050686f6e6510001a0943616b65205465636812202e76aed5f11f5224cac9b04e48c85906bd83eb6b99394bb6b94dd29865a431d8","hostStaticKey":"bc733742ebadfb480edb8aa9720f82e23f745221598a75ccf3e6e1302c7ffde0","autoconnect":true}],"channel":10262,"sendBit":0,"recvBit":0,"sendAckBit":0,"recvAckBit":1,"sendNonce":10,"recvNonce":11,"piggybackAckEnabled":false}',
                   );
                   setState(() => state = std);
                 },
