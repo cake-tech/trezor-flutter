@@ -43,19 +43,14 @@ class BluetoothOptions {
     Duration Function()? prescanDuration,
     Duration Function()? connectionTimeout,
     int Function()? mtu,
-  }) {
-    return BluetoothOptions(
-      scanFilter: scanFilter != null ? scanFilter() : this.scanFilter,
-      requireLocationServicesEnabled: requireLocationServicesEnabled != null
-          ? requireLocationServicesEnabled()
-          : this.requireLocationServicesEnabled,
-      maxScanDuration:
-          maxScanDuration != null ? maxScanDuration() : this.maxScanDuration,
-      prescanDuration:
-          prescanDuration != null ? prescanDuration() : this.prescanDuration,
-      connectionTimeout: connectionTimeout != null
-          ? connectionTimeout()
-          : this.connectionTimeout,
-    );
-  }
+  }) =>
+      BluetoothOptions(
+        scanFilter: scanFilter != null ? scanFilter() : this.scanFilter,
+        requireLocationServicesEnabled: requireLocationServicesEnabled != null
+            ? requireLocationServicesEnabled()
+            : this.requireLocationServicesEnabled,
+        maxScanDuration: maxScanDuration != null ? maxScanDuration() : this.maxScanDuration,
+        prescanDuration: prescanDuration != null ? prescanDuration() : this.prescanDuration,
+        connectionTimeout: connectionTimeout != null ? connectionTimeout() : this.connectionTimeout,
+      );
 }

@@ -8,13 +8,11 @@ class DiscoveredDevice {
   final StreamSubscription? subscription;
   final List<BleService> services;
 
-  DiscoveredDevice({
+  const DiscoveredDevice({
     required this.device,
     required this.subscription,
     required this.services,
   });
 
-  Future<void> disconnect() async {
-    subscription?.cancel();
-  }
+  Future<void> disconnect() async => subscription?.cancel();
 }

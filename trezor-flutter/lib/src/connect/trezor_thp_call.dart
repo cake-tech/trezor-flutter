@@ -8,8 +8,12 @@ import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
 import 'package:trezor_flutter/src/trezor_connection.dart';
 
-Future<(TrezorMessageType, Uint8List)> thpCall(TrezorConnection connection, ThpState state,
-    Uint8List message, TrezorMessageType messageType) async {
+Future<(TrezorMessageType, Uint8List)> thpCall(
+  TrezorConnection connection,
+  ThpState state,
+  Uint8List message,
+  TrezorMessageType messageType,
+) async {
   final response = await connection.sendOperation(
     TrezorThpEncryptedOperation(
       state,

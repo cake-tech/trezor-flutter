@@ -27,10 +27,10 @@ Future<bool> getThpChannel(
       );
     }
 
-    if (state.phase != ThpPhase.paired) {
-      return false;
-    }
+    if (state.phase != ThpPhase.paired) return false;
+
     return true;
   }
+
   return state.phase == ThpPhase.paired;
 }

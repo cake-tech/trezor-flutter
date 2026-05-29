@@ -40,14 +40,11 @@ class MethodChannelTrezorUsb extends TrezorUsbPlatform {
   }
 
   @override
-  Future<Uint8List?> transferIn(int packetSize, int timeout) async {
-    final data = await methodChannel.invokeMethod<Uint8List?>('transferIn', {
-      'length': packetSize,
-      'timeout': timeout,
-    });
-
-    return data;
-  }
+  Future<Uint8List?> transferIn(int packetSize, int timeout) =>
+      methodChannel.invokeMethod<Uint8List?>('transferIn', {
+        'length': packetSize,
+        'timeout': timeout,
+      });
 
   @override
   Future<int> transferOut(Uint8List data, int timeout) async {

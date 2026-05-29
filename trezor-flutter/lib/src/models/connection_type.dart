@@ -1,4 +1,1 @@
-enum ConnectionType {
-  usb,
-  ble,
-}
+enum ConnectionType { usb, ble }

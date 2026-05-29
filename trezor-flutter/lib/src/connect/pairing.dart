@@ -12,16 +12,19 @@ typedef OnCodeEnter = Future<String> Function();
 
 Future<void> thpPairing(TrezorConnection connection, ThpState state,
     {required String hostName, required String appName, required OnCodeEnter onCodeCode}) async {
-  final pairingRequest = ThpPairingRequest(hostName: hostName, appName: appName);
+  await thpCall(
+    connection,
+    state,
+    ThpPairingRequest(hostName: hostName, appName: appName).writeToBuffer(),
+    TrezorMessageType.thpPairingRequest,
+  );
 
-  final res = await thpCall(
-      connection, state, pairingRequest.writeToBuffer(), TrezorMessageType.thpPairingRequest);
-  print("Here: ${res.$1}");
-
-  final selectMethodRequest = ThpSelectMethod(selectedPairingMethod: ThpPairingMethod.CodeEntry);
   final selectMethod = await thpCall(
-      connection, state, selectMethodRequest.writeToBuffer(), TrezorMessageType.thpSelectMethod);
-  print("messageType2: ${selectMethod.$1}");
+    connection,
+    state,
+    ThpSelectMethod(selectedPairingMethod: ThpPairingMethod.CodeEntry).writeToBuffer(),
+    TrezorMessageType.thpSelectMethod,
+  );
 
   if (selectMethod.$1 == TrezorMessageType.thpEndResponse) {
     state.isPaired = true;
@@ -36,13 +39,17 @@ Future<void> thpPairing(TrezorConnection connection, ThpState state,
     // store handshakeCommitment and validate later in `processCodeEntry`
     final codeEntryChallenge = randomBytes(32);
     state.updateHandshakeCredentials(ThpHandshakeCredentials(
-        handshakeCommitment: Uint8List.fromList(message.commitment),
-        codeEntryChallenge: codeEntryChallenge));
+      handshakeCommitment: Uint8List.fromList(message.commitment),
+      codeEntryChallenge: codeEntryChallenge,
+    ));
 
     // State HP3a
-    final thpCodeEntryChallenge = ThpCodeEntryChallenge(challenge: codeEntryChallenge);
-    final codeEntryCpace = await thpCall(connection, state, thpCodeEntryChallenge.writeToBuffer(),
-        TrezorMessageType.thpCodeEntryChallenge);
+    final codeEntryCpace = await thpCall(
+      connection,
+      state,
+      ThpCodeEntryChallenge(challenge: codeEntryChallenge).writeToBuffer(),
+      TrezorMessageType.thpCodeEntryChallenge,
+    );
 
     final codeEntryCpaceMessage = ThpCodeEntryCpaceTrezor.fromBuffer(codeEntryCpace.$2);
 
@@ -51,10 +58,9 @@ Future<void> thpPairing(TrezorConnection connection, ThpState state,
     ));
 
     final code = await onCodeCode();
-    // State HP4 -> HP5
 
+    // State HP4 -> HP5
     await processCodeEntry(connection, state, code);
-    // await waitForPairingTag(device);
 
     final credentials = await getThpCredentials(connection, state);
 
@@ -94,14 +100,17 @@ Future<ThpCredentials> getThpCredentials(TrezorConnection connection, ThpState s
   if (state.handshakeCredentials == null) throw Exception('Device_ThpStateMissing');
 
   final pairingCredential = state.pairingCredentials.firstOrNull;
-  final message = ThpCredentialRequest(
-    autoconnect: autoconnect,
-    hostStaticPublicKey: state.handshakeCredentials!.hostStaticPublicKey!,
-    credential:
-        pairingCredential?.credential != null ? hex.decode(pairingCredential!.credential) : null,
-  );
   final credentials = await thpCall(
-      connection, state, message.writeToBuffer(), TrezorMessageType.thpCredentialRequest);
+    connection,
+    state,
+    ThpCredentialRequest(
+      autoconnect: autoconnect,
+      hostStaticPublicKey: state.handshakeCredentials!.hostStaticPublicKey!,
+      credential:
+          pairingCredential?.credential != null ? hex.decode(pairingCredential!.credential) : null,
+    ).writeToBuffer(),
+    TrezorMessageType.thpCredentialRequest,
+  );
 
   final credentialsResponse = ThpCredentialResponse.fromBuffer(credentials.$2);
   return ThpCredentials(
@@ -114,10 +123,13 @@ Future<ThpCredentials> getThpCredentials(TrezorConnection connection, ThpState s
 
 Future<void> thpPairingEnd(TrezorConnection connection, ThpState state) async {
   await thpCall(
-      connection, state, ThpEndRequest().writeToBuffer(), TrezorMessageType.thpEndRequest);
+    connection,
+    state,
+    ThpEndRequest().writeToBuffer(),
+    TrezorMessageType.thpEndRequest,
+  );
   state.phase = ThpPhase.paired;
 }
-
 
 /// Create a new THP session on the device.
 ///
@@ -126,7 +138,10 @@ Future<void> thpPairingEnd(TrezorConnection connection, ThpState state) async {
 Future<void> thpCreateSession(TrezorConnection connection, ThpState state) async {
   state.createNewSessionId();
 
-  final message = ThpCreateNewSession(passphrase: "", onDevice: false, deriveCardano: false);
-
-  await thpCall(connection, state, message.writeToBuffer(), TrezorMessageType.thpCreateNewSession);
+  await thpCall(
+    connection,
+    state,
+    ThpCreateNewSession(passphrase: "", onDevice: false, deriveCardano: false).writeToBuffer(),
+    TrezorMessageType.thpCreateNewSession,
+  );
 }

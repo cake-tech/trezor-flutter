@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
+import 'package:trezor_flutter/src/trezor/crypto/crypto.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
 import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
-import 'package:trezor_flutter/src/trezor/crypto/crypto.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/paring.dart';
 
@@ -13,8 +13,11 @@ class TrezorThpEncryptedResponse {
   final int messageTypeRaw;
   final Uint8List payload;
 
-  const TrezorThpEncryptedResponse(
-      {required this.sessionId, required this.messageTypeRaw, required this.payload});
+  const TrezorThpEncryptedResponse({
+    required this.sessionId,
+    required this.messageTypeRaw,
+    required this.payload,
+  });
 
   TrezorMessageType get messageType => TrezorMessageType.fromRaw(messageTypeRaw);
 }
@@ -30,20 +33,10 @@ class TrezorThpEncryptedOperation extends TrezorTHPOperation<TrezorThpEncryptedR
 
   @override
   Future<Uint8List> write(ByteDataWriter writer) async {
-    writer.write(addSequenceBit(THPControlByte.encrypted.byte, state.sendBit));
-
-    // Channel (0xFFFF for broadcast/allocation request)
-    writer.writeUint16(state.channel);
-
-    // Length 1 session_id + 2 messageType + protobuf len + 16 tag + 4 crc
-    writer.writeUint16(1 + 2 + data.length + tagLength + crcLength);
-
-    // var magic = addSequenceBit(THP_CONTROL_BYTE.ENCRYPTED, thpState.sendBit);
-    // if (state.isPiggybackAckEnabled) {
-    //   // send ackBit with the actual message
-    //   magic = addAckBit(magic.readUint8(), getPreviousAckBit(thpState));
-    // }
-    // final header = Buffer.concat([magic, channel]);
+    writer
+      ..write(addSequenceBit(THPControlByte.encrypted.byte, state.sendBit))
+      ..writeUint16(state.channel)
+      ..writeUint16(1 + 2 + data.length + tagLength + crcLength);
 
     final messageTypeBytes = ByteData(2);
     messageTypeBytes.setUint16(0, messageType.raw);

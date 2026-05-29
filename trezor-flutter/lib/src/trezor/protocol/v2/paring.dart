@@ -4,10 +4,9 @@ import 'package:trezor_flutter/src/trezor/crypto/aesgcm.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/messages-thp.pb.dart';
 import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
+import 'package:trezor_flutter/src/utils/curve25519.dart';
 import 'package:trezor_flutter/src/utils/paring.dart';
 import 'package:trezor_flutter/src/utils/random_bytes.dart';
-
-import '../../../utils/curve25519.dart';
 
 List<ThpCredentials> findKnownPairingCredentials(
   List<ThpCredentials> knownCredentials,

@@ -7,9 +7,9 @@ import 'package:trezor_flutter/src/utils/random_bytes.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
 Future<void> thpHandshake(TrezorConnection connection, ThpState state) async {
-  var hostEphemeralKeyPair = getCurve25519KeyPair(randomBytes(32));
+  final hostEphemeralKeyPair = getCurve25519KeyPair(randomBytes(32));
 
-  final res = await connection.sendOperation(
+  final handshakeInitResponse = await connection.sendOperation(
     TrezorThpHandshakeInitOperation(state, hostEphemeralKeyPair: hostEphemeralKeyPair),
   );
 
@@ -17,9 +17,9 @@ Future<void> thpHandshake(TrezorConnection connection, ThpState state) async {
   await connection.sendOperation(TrezorThpAckOperation(state));
 
   final cred = handleHandshakeInit(
-    handshakeInitResponse: res,
+    handshakeInitResponse: handshakeInitResponse,
     thpState: state,
-    knownCredentials: state.pairingCredentials,
+    knownCredentials: [], // ToDo: Autoconnect credentials
     hostEphemeralKeys: hostEphemeralKeyPair,
     tryToUnlock: 0,
   );
@@ -39,8 +39,11 @@ Future<void> thpHandshake(TrezorConnection connection, ThpState state) async {
   await Future.delayed(const Duration(milliseconds: 100));
 
   final requiresParing = await connection.sendOperation(
-    TrezorThpHandshakeCompletionOperation(state,
-        hostPubkey: cred.hostEncryptedStaticPubkey, encryptedPayload: cred.encryptedPayload),
+    TrezorThpHandshakeCompletionOperation(
+      state,
+      hostPubkey: cred.hostEncryptedStaticPubkey,
+      encryptedPayload: cred.encryptedPayload,
+    ),
   );
   state.updateSyncBit(true);
 

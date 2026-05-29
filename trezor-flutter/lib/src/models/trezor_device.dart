@@ -9,7 +9,7 @@ class TrezorDevice {
   final int rssi;
   final TrezorDeviceType deviceInfo;
 
-  TrezorDevice({
+  const TrezorDevice({
     required this.id,
     required this.name,
     required this.connectionType,
