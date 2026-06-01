@@ -95,6 +95,8 @@ class TrezorUsbManager extends ConnectionManager {
     return const Stream.empty();
   }
 
+  final Map<String, TrezorDevice> _usbDevices = {};
+
   @override
   Future<List<TrezorDevice>> get devices async {
     if (_disposed) throw TrezorManagerDisposedException(connectionType);
@@ -102,10 +104,10 @@ class TrezorUsbManager extends ConnectionManager {
     try {
       final usbDevices = await _usbTransport.listDevices();
 
-      final results = <TrezorDevice>[];
-
       for (final device in usbDevices) {
         final tDevice = TrezorDevice.usb(device);
+        if (_usbDevices.keys.contains(tDevice.id)) continue;
+
         await connect(tDevice);
 
         try {
@@ -120,17 +122,21 @@ class TrezorUsbManager extends ConnectionManager {
 
           final feature = Features.fromBuffer(initialize.payload);
 
-          results.add(TrezorDevice.usb(
+          _usbDevices[tDevice.id] = TrezorDevice.usb(
             device,
             TrezorDeviceType.fromInternalModel(feature.internalModel),
-          ));
+          );
         } on TrezorFailureException catch (e) {
           // Code 17 is invalid protocol happening only on Safe 7
-          if (e.code == 17) results.add(TrezorDevice.usb(device, TrezorDeviceType.safe7));
+          if (e.code == 17) {
+            _usbDevices[tDevice.id] = TrezorDevice.usb(device, TrezorDeviceType.safe7);
+          }
+        } finally {
+          disconnect(tDevice.id);
         }
       }
 
-      return results;
+      return _usbDevices.values.toList();
     } on PlatformException catch (ex) {
       throw TrezorExceptionUtils.fromPlatformException(ex, connectionType);
     }
@@ -152,6 +158,8 @@ class TrezorUsbManager extends ConnectionManager {
 
   @override
   Future<void> dispose() async {
+    _usbDevices.clear();
+
     if (_disposed) return;
     _disposed = true;
 
