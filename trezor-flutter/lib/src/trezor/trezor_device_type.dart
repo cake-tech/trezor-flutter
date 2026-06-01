@@ -45,4 +45,21 @@ enum TrezorDeviceType {
   final bool usbOnly;
   final int productIdMM;
   final bool usesThp;
+
+  static TrezorDeviceType fromInternalModel(String internalModel) {
+    switch (internalModel) {
+      case "T1B1":
+        return modelOne;
+      case "T2T1":
+        return modelT;
+      case "T2B1":
+      case "T3B1":
+        return safe3;
+      case "T3T1":
+        return safe5;
+      case "T3W1":
+        return safe7;
+    }
+    return safe5;
+  }
 }

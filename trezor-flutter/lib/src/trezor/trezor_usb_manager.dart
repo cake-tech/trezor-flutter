@@ -3,8 +3,12 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/operations/trezor/thp_ack_operation.dart';
+import 'package:trezor_flutter/src/operations/trezor/v1_operation.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
+import 'package:trezor_flutter/src/trezor/protobuf/messages-management.pb.dart';
+import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/trezor/protocol/decoder.dart';
+import 'package:trezor_flutter/src/trezor/transformer/v1_transformer.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/exception_utils.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
@@ -97,7 +101,36 @@ class TrezorUsbManager extends ConnectionManager {
 
     try {
       final usbDevices = await _usbTransport.listDevices();
-      return usbDevices.map(TrezorDevice.usb).toList();
+
+      final results = <TrezorDevice>[];
+
+      for (final device in usbDevices) {
+        final tDevice = TrezorDevice.usb(device);
+        await connect(tDevice);
+
+        try {
+          final initialize = await sendRawOperation(
+            tDevice,
+            TrezorV1Operation(
+              data: Initialize().writeToBuffer(),
+              messageType: TrezorMessageType.initialize.raw,
+            ),
+            const V1Transformer(),
+          );
+
+          final feature = Features.fromBuffer(initialize.payload);
+
+          results.add(TrezorDevice.usb(
+            device,
+            TrezorDeviceType.fromInternalModel(feature.internalModel),
+          ));
+        } on TrezorFailureException catch (e) {
+          // Code 17 is invalid protocol happening only on Safe 7
+          if (e.code == 17) results.add(TrezorDevice.usb(device, TrezorDeviceType.safe7));
+        }
+      }
+
+      return results;
     } on PlatformException catch (ex) {
       throw TrezorExceptionUtils.fromPlatformException(ex, connectionType);
     }

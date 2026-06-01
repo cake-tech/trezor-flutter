@@ -31,14 +31,13 @@ class TrezorDevice {
         deviceInfo: deviceInfo,
       );
 
-  factory TrezorDevice.usb(UsbDevice device) => TrezorDevice(
+  factory TrezorDevice.usb(UsbDevice device,
+          [TrezorDeviceType deviceInfo = TrezorDeviceType.safe5]) =>
+      TrezorDevice(
         id: device.identifier,
         name: device.productName,
         connectionType: ConnectionType.usb,
-        deviceInfo: TrezorDeviceType.values.firstWhere(
-          (e) => device.productId >> 8 == e.productIdMM,
-          orElse: () => TrezorDeviceType.safe5,
-        ),
+        deviceInfo: deviceInfo,
       );
 
   TrezorDevice copyWith({

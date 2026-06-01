@@ -24,7 +24,7 @@ class DeviceCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SvgPicture.asset("assets/trezorSafe7.svg", width: 50),
+          SvgPicture.asset(imagePath, width: 50, color: Colors.black),
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(left: 16),
@@ -40,4 +40,19 @@ class DeviceCard extends StatelessWidget {
       ),
     ),
   );
+
+  String get imagePath {
+    switch (device.deviceInfo) {
+      case TrezorDeviceType.modelOne:
+        return "assets/device_trezor_model_one.svg";
+      case TrezorDeviceType.modelT:
+        return "assets/device_trezor_model_t.svg";
+      case TrezorDeviceType.safe3:
+        return "assets/device_trezor_safe_3.svg";
+      case TrezorDeviceType.safe5:
+        return "assets/device_trezor_safe_5.svg";
+      case TrezorDeviceType.safe7:
+        return "assets/device_trezor_safe_7.svg";
+    }
+  }
 }

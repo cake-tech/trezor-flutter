@@ -29,4 +29,8 @@ flutter:
   uses-material-design: true
 
   assets:
-     - assets/trezorSafe7.svg
+     - assets/device_trezor_model_one.svg
+     - assets/device_trezor_model_t.svg
+     - assets/device_trezor_safe_3.svg
+     - assets/device_trezor_safe_5.svg
+     - assets/device_trezor_safe_7.svg
