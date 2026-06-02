@@ -23,8 +23,8 @@ Constants getConstants() {
     '19681161376707505956807079304988542015446066515923890162744021073123829784752',
   ); // sqrt(-1)
 
-  final c4 = BigInt.from((p - BigInt.from(5)) / BigInt.from(8));
-  final a24 = BigInt.from((J + BigInt.from(2)) / BigInt.from(4));
+  final c4 = (p - BigInt.from(5)) ~/ BigInt.from(8);
+  final a24 = (J + BigInt.from(2)) ~/ BigInt.from(4);
 
   constants = Constants(p, J, c3, c4, a24);
   return constants!;

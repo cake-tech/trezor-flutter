@@ -8,7 +8,7 @@ import 'package:trezor_flutter/trezor_flutter.dart';
 
 import 'monero_tx.dart';
 
-bool usbMode = true;
+bool usbMode = false;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -145,15 +145,6 @@ class _HomePageState extends State<HomePage> {
             children: [
               TextButton(onPressed: clearList, child: Text("Clear List")),
               TextButton(onPressed: () => print(state.toJsonString()), child: Text("print State")),
-              TextButton(
-                onPressed: () {
-                  final std = ThpState.fromJson(
-                    '{"properties":{"1":"T3W1","2":1,"3":2,"4":1,"5":[2]},"credentials":[{"trezorStaticPublicKey":"8b6ace3e9ba34c14ea3e12abecaa89b228aab5ef225d47cb957d5815a9d6ad79","credential":"0a240a1543616b652057616c6c6574204465762050686f6e6510001a0943616b65205465636812202e76aed5f11f5224cac9b04e48c85906bd83eb6b99394bb6b94dd29865a431d8","hostStaticKey":"bc733742ebadfb480edb8aa9720f82e23f745221598a75ccf3e6e1302c7ffde0","autoconnect":true}],"channel":10262,"sendBit":0,"recvBit":0,"sendAckBit":0,"recvAckBit":1,"sendNonce":10,"recvNonce":11,"piggybackAckEnabled":false}',
-                  );
-                  setState(() => state = std);
-                },
-                child: Text("Load State"),
-              ),
               TextButton(
                 onPressed: () => setState(() => state = ThpState()),
                 child: Text("Reset State"),

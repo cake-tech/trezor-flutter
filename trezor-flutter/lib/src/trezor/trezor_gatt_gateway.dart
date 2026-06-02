@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:trezor_flutter/src/api/api.dart';
 import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/models/connection_type.dart';
 import 'package:trezor_flutter/src/models/discovered_device.dart';
@@ -14,8 +14,6 @@ import 'package:trezor_flutter/src/utils/buffer.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
 import 'package:universal_ble/universal_ble.dart';
 import 'package:universal_platform/universal_platform.dart';
-
-import '../api/api.dart';
 
 const _bleWriteTimeout = Duration(seconds: 10);
 
@@ -329,65 +327,5 @@ class _Request {
   final Completer completer;
   TrezorPackage? decodedPackage;
 
-  final Map<int, Uint8List> _partialData = {};
-  int _expectedDataLength = -1; // read from packet 0
-
-  void addData(Uint8List data) {
-    // First packet should be at least 5 bytes long
-    // Rest should be at least 3 bytes long
-    if (data.length < 3 || (data[2] == 0 && data.length < 5)) {
-      throw UnexpectedDataPacketException(
-        data: data,
-        reason: UnexpectedDataPacketReason.tooShortLength,
-        connectionType: ConnectionType.ble,
-      );
-    }
-    final packetIndex = data[2];
-    if (_partialData.containsKey(packetIndex)) {
-      throw UnexpectedDataPacketException(
-        reason: UnexpectedDataPacketReason.indexAlreadySet,
-        connectionType: ConnectionType.ble,
-      );
-    }
-
-    if (packetIndex == 0) {
-      if (_expectedDataLength != -1) {
-        throw UnexpectedDataPacketException(
-          reason: UnexpectedDataPacketReason.dataLengthAlreadySet,
-          connectionType: ConnectionType.ble,
-        );
-      }
-      _expectedDataLength = data[4];
-    }
-
-    // for first packet, skip the first 5 bytes | for the rest, skip the first 3 bytes
-    final noPrefixData = data.sublist(packetIndex == 0 ? 5 : 3);
-    if (noPrefixData.isNotEmpty) {
-      // I think for all requests we get a last empty packet with just the index
-      // -- Not sure if this is always the case so I will ignore it for now
-      _partialData[packetIndex] = noPrefixData;
-    }
-  }
-
-  int get expectedDataLength => _expectedDataLength;
-
-  int get currentDataLength =>
-      _partialData.values.fold(0, (acc, e) => acc + e.length);
-
-  bool get isComplete => currentDataLength == expectedDataLength;
-
-  Uint8List get data {
-    final data = _partialData.entries
-        .sortedByCompare((e) => e.key, (a, b) => a.compareTo(b))
-        .map((e) => e.value)
-        .expand((e) => e)
-        .toList();
-    return Uint8List.fromList(data);
-  }
-
   _Request(this.operation, this.transformer, this.completer);
-}
-
-extension ObjectExt<T> on T {
-  R let<R>(R Function(T that) op) => op(this);
 }
