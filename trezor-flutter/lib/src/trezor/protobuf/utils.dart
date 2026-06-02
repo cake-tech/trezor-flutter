@@ -1,7 +1,6 @@
-import 'package:collection/collection.dart';
-
 import 'messages-thp.pb.dart';
 
+// https://github.com/trezor/trezor-firmware/blob/c190a986042306a145f2ba24856a588bf5abc2bd/common/protob/messages.proto
 ThpMessageType getMessageType(int messageType) =>
     ThpMessageType.values.firstWhere((mt) => mt.value == messageType);
 
@@ -15,6 +14,9 @@ enum TrezorMessageType {
   buttonRequest(26), // device is waiting for user confirmation
   buttonAck(27), // host acknowledgment of button request
   address(30),
+  passphraseRequest(41),
+  passphraseAck(42),
+
   thpCreateNewSession(1000),
   thpPairingRequest(1008),
   thpPairingRequestApproved(1009),

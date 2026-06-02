@@ -43,16 +43,21 @@ class TrezorClientV1 extends TrezorClient {
         TrezorV1Operation(data: message, messageType: messageType.raw),
         transformer: const V1Transformer());
 
-    if (response.messageType == TrezorMessageType.failure) {
-      final fail = Failure.fromBuffer(response.payload);
-      throw TrezorFailureException(fail);
-    }
+    switch (response.messageType) {
+      case TrezorMessageType.failure:
+        final fail = Failure.fromBuffer(response.payload);
+        throw TrezorFailureException(fail);
 
-    if (response.messageType == TrezorMessageType.buttonRequest) {
-      return call(ButtonAck().writeToBuffer(), TrezorMessageType.buttonAck);
-    }
+      case TrezorMessageType.buttonRequest:
+        return call(ButtonAck().writeToBuffer(), TrezorMessageType.buttonAck);
 
-    return (response.messageTypeRaw, response.payload);
+      case TrezorMessageType.passphraseRequest:
+        print("Sending Empty passphrase");
+        return call(PassphraseAck(passphrase: "").writeToBuffer(), TrezorMessageType.passphraseAck);
+
+      default:
+        return (response.messageTypeRaw, response.payload);
+    }
   }
 
   @override
@@ -79,12 +84,13 @@ class TrezorClientV2 extends TrezorClient {
   Future<String> Function() onPinCode;
   List<int>? sessionId;
 
-  TrezorClientV2(super.connection,
-      this.state, {
-        required this.onPinCode,
-        required this.appName,
-        required this.hostName,
-      });
+  TrezorClientV2(
+    super.connection,
+    this.state, {
+    required this.onPinCode,
+    required this.appName,
+    required this.hostName,
+  });
 
   @override
   Future<(int, Uint8List)> call(Uint8List message, TrezorMessageType messageType) async {
@@ -94,8 +100,7 @@ class TrezorClientV2 extends TrezorClient {
   }
 
   @override
-  Future<void> createChannel() =>
-      getThpChannel(
+  Future<void> createChannel() => getThpChannel(
         connection,
         state,
         appName: appName,
