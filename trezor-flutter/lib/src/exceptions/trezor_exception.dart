@@ -161,3 +161,10 @@ class TrezorChannelException extends TrezorException {
   @override
   String toString() => "$runtimeType(${error.label})";
 }
+
+class TrezorSessionExpiredException extends TrezorException {
+  const TrezorSessionExpiredException();
+
+  @override
+  String toString() => "$runtimeType()";
+}

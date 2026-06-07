@@ -25,6 +25,7 @@ dependencies:
   fixnum: ^1.1.1
   pointycastle: ^3.7.3
   fast_base58: ^0.2.1
+  unorm_dart: ^0.3.2
 
 dev_dependencies:
   # flutter_test:
