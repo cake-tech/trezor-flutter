@@ -4,6 +4,7 @@ export "package:universal_ble/universal_ble.dart";
 
 export 'src/connect/coins/monero.dart';
 export 'src/connect/trezor_client.dart';
+export 'src/exceptions/trezor_exception.dart';
 export 'src/models/bluetooth_options.dart';
 export 'src/models/connection_type.dart';
 export 'src/models/discovered_device.dart';

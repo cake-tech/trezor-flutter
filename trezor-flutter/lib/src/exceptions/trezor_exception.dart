@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:trezor_flutter/src/trezor/protobuf/messages-common.pb.dart';
-import 'package:trezor_flutter/trezor_flutter.dart';
+import 'package:trezor_flutter/src/models/connection_type.dart';
 
 sealed class TrezorException implements Exception {
   const TrezorException();
@@ -136,23 +136,28 @@ enum UnexpectedDataPacketReason {
   receivedDataWithNoPendingRequest,
 }
 
-class TrezorChannelException implements TrezorException {
-  const TrezorChannelException._(this.error);
+enum TrezorChannelError {
+  busy(0x01, "ThpTransportBusy"),
+  unallocatedChannel(0x02, "ThpUnallocatedChannel"),
+  decryptionFailed(0x03, "ThpDecryptionFailed"),
+  deviceLocked(0x05, "ThpDeviceLocked"),
+  unknown(null, "ThpUnknownError");
 
-  factory TrezorChannelException.fromInt(int code) {
-    final message = switch (code) {
-      0x01 => "ThpTransportBusy",
-      0x02 => "ThpUnallocatedChannel",
-      0x03 => "ThpDecryptionFailed",
-      0x05 => "ThpDeviceLocked",
-      _ => "ThpUnknownError",
-    };
+  const TrezorChannelError(this.code, this.label);
 
-    return TrezorChannelException._(message);
-  }
+  /// Wire value of the THP error frame; `null` for [unknown]
+  final int? code;
+  final String label;
 
-  final String error;
+  static TrezorChannelError fromCode(int code) =>
+      values.firstWhere((e) => e.code == code, orElse: () => unknown);
+}
+
+class TrezorChannelException extends TrezorException {
+  const TrezorChannelException(this.error);
+
+  final TrezorChannelError error;
 
   @override
-  String toString() => "$runtimeType($error)";
+  String toString() => "$runtimeType(${error.label})";
 }
