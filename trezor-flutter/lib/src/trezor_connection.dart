@@ -51,6 +51,12 @@ class TrezorConnection {
     );
   }
 
+  Future<void> sendOutOfBand(TrezorOperation operation) {
+    if (_isDisconnected) return Future.value();
+
+    return _connectionManager.sendOutOfBand(device, operation);
+  }
+
   Future<T> _sendOperationImpl<T>(
     TrezorDevice device,
     TrezorOperation<T> operation,

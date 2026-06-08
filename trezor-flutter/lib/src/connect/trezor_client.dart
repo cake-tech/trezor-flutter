@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:trezor_flutter/src/connect/acquire.dart';
 import 'package:trezor_flutter/src/connect/pairing.dart';
 import 'package:trezor_flutter/src/connect/trezor_thp_call.dart';
+import 'package:trezor_flutter/src/operations/trezor/thp_encrypted_operation.dart';
 import 'package:trezor_flutter/src/operations/trezor/v1_operation.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/messages-common.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/messages-management.pb.dart';
@@ -39,6 +40,9 @@ abstract class TrezorClient {
 
   /// Make a call to the Trezor Device
   Future<(int, Uint8List)> call(Uint8List message, TrezorMessageType messageType);
+
+  /// Abort an in-flight on-device prompt; the pending call fails with ActionCancelled
+  Future<void> cancel();
 
   /// Whether the device forces passphrase entry on its own screen
   bool get passphraseAlwaysOnDevice;
@@ -80,6 +84,9 @@ class TrezorClientV1 extends TrezorClient {
   }
 
   @override
+  Future<void> cancel() => connection.disconnect();
+
+  @override
   Future<void> createChannel({TrezorPassphrase? passphrase}) async {
     if (passphrase != null) _sessionIntent.store(passphrase);
     if (sessionId != null) return;
@@ -115,8 +122,7 @@ class TrezorClientV1 extends TrezorClient {
     _features = features;
 
     return TrezorSessionInfo(
-      enteredOnDevice:
-          passphrase is TrezorPassphraseOnDevice || features.passphraseAlwaysOnDevice,
+      enteredOnDevice: passphrase is TrezorPassphraseOnDevice || features.passphraseAlwaysOnDevice,
       resumed: listEquals(features.sessionId, resumeSessionId),
       sessionId: features.sessionId,
     );
@@ -157,6 +163,19 @@ class TrezorClientV2 extends TrezorClient {
       default:
         return (response.$1.raw, response.$2);
     }
+  }
+
+  @override
+  Future<void> cancel() {
+    if (!state.cancelablePromise) return connection.disconnect();
+
+    return connection.sendOutOfBand(
+      TrezorThpEncryptedOperation(
+        state,
+        data: Cancel().writeToBuffer(),
+        messageType: TrezorMessageType.cancel,
+      ),
+    );
   }
 
   @override

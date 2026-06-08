@@ -10,6 +10,7 @@ enum TrezorMessageType {
   success(2),
   failure(3),
   features(17),
+  cancel(20),
   getFeatures(55),
 
   buttonRequest(26), // device is waiting for user confirmation

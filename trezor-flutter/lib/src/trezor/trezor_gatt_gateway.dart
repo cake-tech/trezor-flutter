@@ -218,6 +218,19 @@ class TrezorGattGateway extends GattGateway {
       _pendingOperations.addFirst(_Request(operation, transformer, completer));
     }
 
+    await _writePayloads(operation);
+
+    if (operation is TrezorThpAckOperation) {
+      completer.complete();
+    }
+
+    return completer.future;
+  }
+
+  @override
+  Future<void> sendWriteOnly(TrezorOperation operation) => _writePayloads(operation);
+
+  Future<void> _writePayloads(TrezorOperation operation) async {
     final writer = ByteDataWriter();
     final output = await operation.write(writer);
     final payloads = _packer.pack(output, 244);
@@ -230,13 +243,7 @@ class TrezorGattGateway extends GattGateway {
         withoutResponse: false,
         timeout: _bleWriteTimeout,
       );
-
-      if (operation is TrezorThpAckOperation) {
-        completer.complete();
-      }
     }
-
-    return completer.future;
   }
 
   @override

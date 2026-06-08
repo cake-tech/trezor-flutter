@@ -30,8 +30,12 @@ Future<(TrezorMessageType, Uint8List)> thpCall(
 
   if (response.messageType == TrezorMessageType.buttonRequest) {
     state.cancelablePromise = true;
-
-    return thpCall(connection, state, ButtonAck().writeToBuffer(), TrezorMessageType.buttonAck);
+    try {
+      return await thpCall(
+          connection, state, ButtonAck().writeToBuffer(), TrezorMessageType.buttonAck);
+    } finally {
+      state.cancelablePromise = false;
+    }
   }
 
   return (response.messageType, response.payload);
