@@ -127,6 +127,8 @@ class _HomePageState extends State<HomePage> {
                   onCodePin,
                 );
 
+                client.passphrase = "CakeWallet";
+
                 await client.createChannel();
 
                 monero = TrezorMonero(client);

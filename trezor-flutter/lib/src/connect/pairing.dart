@@ -10,8 +10,13 @@ import 'package:trezor_flutter/trezor_flutter.dart';
 
 typedef OnCodeEnter = Future<String> Function();
 
-Future<void> thpPairing(TrezorConnection connection, ThpState state,
-    {required String hostName, required String appName, required OnCodeEnter onCodeCode}) async {
+Future<void> thpPairing(
+  TrezorConnection connection,
+  ThpState state, {
+  required String hostName,
+  required String appName,
+  required OnCodeEnter onCodeCode,
+}) async {
   await thpCall(
     connection,
     state,
@@ -69,7 +74,6 @@ Future<void> thpPairing(TrezorConnection connection, ThpState state,
   }
 
   await thpPairingEnd(connection, state);
-  await thpCreateSession(connection, state);
 }
 
 Future<void> processCodeEntry(TrezorConnection connection, ThpState state, String code) async {
@@ -80,10 +84,10 @@ Future<void> processCodeEntry(TrezorConnection connection, ThpState state, Strin
       getSharedSecret(state.handshakeCredentials!.trezorCpacePublicKey!, hostKeys.privateKey);
 
   final codeEntrySecret = await thpCall(
-      connection,
-      state,
-      ThpCodeEntryCpaceHostTag(tag: tag, cpaceHostPublicKey: hostKeys.publicKey).writeToBuffer(),
-      TrezorMessageType.thpCodeEntryCpaceHostTag,
+    connection,
+    state,
+    ThpCodeEntryCpaceHostTag(tag: tag, cpaceHostPublicKey: hostKeys.publicKey).writeToBuffer(),
+    TrezorMessageType.thpCodeEntryCpaceHostTag,
   );
 
   final codeEntrySecretResponse = ThpCodeEntrySecret.fromBuffer(codeEntrySecret.$2);
@@ -114,10 +118,10 @@ Future<ThpCredentials> getThpCredentials(TrezorConnection connection, ThpState s
 
   final credentialsResponse = ThpCredentialResponse.fromBuffer(credentials.$2);
   return ThpCredentials(
-      trezorStaticPublicKey: hex.encode(credentialsResponse.trezorStaticPublicKey),
-      credential: hex.encode(credentialsResponse.credential),
-      hostStaticKey: hex.encode(state.handshakeCredentials!.staticKey!),
-      autoconnect: autoconnect,
+    trezorStaticPublicKey: hex.encode(credentialsResponse.trezorStaticPublicKey),
+    credential: hex.encode(credentialsResponse.credential),
+    hostStaticKey: hex.encode(state.handshakeCredentials!.staticKey!),
+    autoconnect: autoconnect,
   );
 }
 
@@ -135,13 +139,15 @@ Future<void> thpPairingEnd(TrezorConnection connection, ThpState state) async {
 ///
 /// This sends ThpCreateNewSession and waits for Success.
 /// Must be called after handshake is complete but before sending other messages.
-Future<void> thpCreateSession(TrezorConnection connection, ThpState state) async {
+Future<void> thpCreateSession(
+    TrezorConnection connection, ThpState state, String? passphrase) async {
   state.createNewSessionId();
 
   await thpCall(
     connection,
     state,
-    ThpCreateNewSession(passphrase: "", onDevice: false, deriveCardano: false).writeToBuffer(),
+    ThpCreateNewSession(passphrase: passphrase ?? "", onDevice: false, deriveCardano: false)
+        .writeToBuffer(),
     TrezorMessageType.thpCreateNewSession,
   );
 }

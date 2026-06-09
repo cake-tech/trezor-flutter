@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:trezor_flutter/src/connect/acquire.dart';
+import 'package:trezor_flutter/src/connect/pairing.dart';
 import 'package:trezor_flutter/src/connect/trezor_thp_call.dart';
 import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/operations/trezor/v1_operation.dart';
@@ -28,6 +29,9 @@ abstract class TrezorClient {
   /// Create a new Channel for THP or Initialize a new Session for V1
   Future<void> createChannel();
 
+  /// Set a passphrase for the trezor device
+  String? passphrase;
+
   /// Make a call to the Trezor Device
   Future<(int, Uint8List)> call(Uint8List message, TrezorMessageType messageType);
 }
@@ -52,8 +56,8 @@ class TrezorClientV1 extends TrezorClient {
         return call(ButtonAck().writeToBuffer(), TrezorMessageType.buttonAck);
 
       case TrezorMessageType.passphraseRequest:
-        print("Sending Empty passphrase");
-        return call(PassphraseAck(passphrase: "").writeToBuffer(), TrezorMessageType.passphraseAck);
+        return call(PassphraseAck(passphrase: passphrase ?? "").writeToBuffer(),
+            TrezorMessageType.passphraseAck);
 
       default:
         return (response.messageTypeRaw, response.payload);
@@ -96,7 +100,21 @@ class TrezorClientV2 extends TrezorClient {
   Future<(int, Uint8List)> call(Uint8List message, TrezorMessageType messageType) async {
     final response = await thpCall(connection, state, message, messageType);
 
-    return (response.$1.raw, response.$2);
+    switch (response.$1) {
+      case TrezorMessageType.failure:
+        final fail = Failure.fromBuffer(response.$2);
+        throw TrezorFailureException(fail);
+
+      case TrezorMessageType.buttonRequest:
+        return call(ButtonAck().writeToBuffer(), TrezorMessageType.buttonAck);
+
+      case TrezorMessageType.passphraseRequest:
+        return call(PassphraseAck(passphrase: passphrase ?? "").writeToBuffer(),
+            TrezorMessageType.passphraseAck);
+
+      default:
+        return (response.$1.raw, response.$2);
+    }
   }
 
   @override
@@ -106,5 +124,10 @@ class TrezorClientV2 extends TrezorClient {
         appName: appName,
         hostName: hostName,
         onCodeCode: onPinCode,
+        passphrase: passphrase,
       );
+
+  Future<ThpCredentials> getAutoparing() {
+    return getThpCredentials(connection, state, true);
+  }
 }
