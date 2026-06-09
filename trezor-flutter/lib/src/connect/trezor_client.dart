@@ -27,10 +27,9 @@ abstract class TrezorClient {
   final TrezorConnection connection;
 
   /// Create a new Channel for THP or Initialize a new Session for V1
-  Future<void> createChannel();
-
-  /// Set a passphrase for the trezor device
-  String? passphrase;
+  ///
+  /// [passphrase] is used to optionally set an passphrase for the given channel
+  Future<void> createChannel({String? passphrase});
 
   /// Make a call to the Trezor Device
   Future<(int, Uint8List)> call(Uint8List message, TrezorMessageType messageType);
@@ -38,6 +37,7 @@ abstract class TrezorClient {
 
 class TrezorClientV1 extends TrezorClient {
   List<int>? sessionId;
+  String? _passphrase;
 
   TrezorClientV1(super.connection);
 
@@ -56,7 +56,7 @@ class TrezorClientV1 extends TrezorClient {
         return call(ButtonAck().writeToBuffer(), TrezorMessageType.buttonAck);
 
       case TrezorMessageType.passphraseRequest:
-        return call(PassphraseAck(passphrase: passphrase ?? "").writeToBuffer(),
+        return call(PassphraseAck(passphrase: _passphrase ?? "").writeToBuffer(),
             TrezorMessageType.passphraseAck);
 
       default:
@@ -65,7 +65,8 @@ class TrezorClientV1 extends TrezorClient {
   }
 
   @override
-  Future<void> createChannel() async {
+  Future<void> createChannel({String? passphrase}) async {
+    _passphrase = passphrase;
     if (sessionId != null) return;
 
     final initialize = await connection.sendOperation(
@@ -108,17 +109,13 @@ class TrezorClientV2 extends TrezorClient {
       case TrezorMessageType.buttonRequest:
         return call(ButtonAck().writeToBuffer(), TrezorMessageType.buttonAck);
 
-      case TrezorMessageType.passphraseRequest:
-        return call(PassphraseAck(passphrase: passphrase ?? "").writeToBuffer(),
-            TrezorMessageType.passphraseAck);
-
       default:
         return (response.$1.raw, response.$2);
     }
   }
 
   @override
-  Future<void> createChannel() => getThpChannel(
+  Future<void> createChannel({String? passphrase}) => getThpChannel(
         connection,
         state,
         appName: appName,
