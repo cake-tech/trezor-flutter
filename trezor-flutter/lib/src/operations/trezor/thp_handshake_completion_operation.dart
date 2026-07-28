@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
 import 'package:trezor_flutter/src/trezor/crypto/crypto.dart';
@@ -40,8 +41,7 @@ class TrezorThpHandshakeCompletionOperation extends TrezorTHPOperation<int> {
     final headers = readHeaders(reader);
 
     if (headers.controlByte == THPControlByte.error) {
-      final error = readError(reader);
-      throw Exception(error);
+      throw TrezorChannelException.fromInt(readError(reader));
     }
 
     final cipherText = reader.read(headers.length - 4);

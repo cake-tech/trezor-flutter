@@ -307,7 +307,7 @@ class ThpState {
 
   Map<String, dynamic> toMap() => {
         "properties": properties?.writeToJsonMap(),
-        "credentials": pairingCredentials.map((e) => e.toMap()).toList(),
+        "credentials": pairingCredentials.where((e) => e.autoconnect == true).map((e) => e.toMap()).toList(),
         "channel": channel,
         "sendBit": sendBit,
         "recvBit": recvBit,

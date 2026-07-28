@@ -1,8 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:trezor_flutter/src/api/api.dart';
-import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
+import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/trezor/crypto/crypto.dart';
+import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
 import 'package:trezor_flutter/src/utils/buffer.dart';
 
 class CrcValidator extends TrezorTransformer {
@@ -29,18 +30,7 @@ class CrcValidator extends TrezorTransformer {
     if (calculatedCrc != expectedCrc) throw Exception("Crc Missmatch");
 
     if (controlByteRaw == THPControlByte.error.byte) {
-      switch (payload.first) {
-        case 0x01:
-          return throw Exception("ThpTransportBusy");
-        case 0x02:
-          return throw Exception("ThpUnallocatedChannel");
-        case 0x03:
-          return throw Exception("ThpDecryptionFailed");
-        case 0x05:
-          return throw Exception("ThpDeviceLocked");
-        default:
-          return throw Exception("ThpUnknownError $payload");
-      }
+      throw TrezorChannelException.fromInt(payload.first);
     }
 
     return bytes;

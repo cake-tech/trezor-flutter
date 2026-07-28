@@ -3,12 +3,14 @@ import 'dart:typed_data';
 import 'package:trezor_flutter/src/trezor/protobuf/messages-common.pb.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
-sealed class TrezorException implements Exception {}
+sealed class TrezorException implements Exception {
+  const TrezorException();
+}
 
 class TrezorFailureException extends TrezorException {
   final Failure _fail;
 
-  TrezorFailureException(this._fail);
+  const TrezorFailureException(this._fail);
 
   int get code => _fail.code.value;
 
@@ -23,9 +25,7 @@ class TrezorFailureException extends TrezorException {
 class PermissionException extends TrezorException {
   final ConnectionType connectionType;
 
-  PermissionException({
-    required this.connectionType,
-  });
+  const PermissionException({required this.connectionType});
 
   @override
   String toString() => "$runtimeType($connectionType)";
@@ -35,10 +35,7 @@ class EstablishConnectionException extends TrezorException {
   final ConnectionType connectionType;
   final Object nestedError;
 
-  EstablishConnectionException({
-    required this.connectionType,
-    required this.nestedError,
-  });
+  const EstablishConnectionException({required this.connectionType, required this.nestedError});
 
   @override
   String toString() => "$runtimeType($connectionType, $nestedError)";
@@ -47,9 +44,7 @@ class EstablishConnectionException extends TrezorException {
 class ConnectionLostException extends TrezorException {
   final ConnectionType connectionType;
 
-  ConnectionLostException({
-    required this.connectionType,
-  });
+  const ConnectionLostException({required this.connectionType});
 
   @override
   String toString() => "$runtimeType($connectionType)";
@@ -58,7 +53,7 @@ class ConnectionLostException extends TrezorException {
 class TrezorManagerDisposedException extends TrezorException {
   final ConnectionType connectionType;
 
-  TrezorManagerDisposedException(this.connectionType);
+  const TrezorManagerDisposedException(this.connectionType);
 
   @override
   String toString() => "$runtimeType($connectionType)";
@@ -68,10 +63,7 @@ class DisposeException extends TrezorException {
   final ConnectionType connectionType;
   final Object? cause;
 
-  DisposeException({
-    required this.connectionType,
-    required this.cause,
-  });
+  const DisposeException({required this.connectionType, required this.cause});
 
   @override
   String toString() => "$runtimeType($connectionType, $cause)";
@@ -81,7 +73,7 @@ class DeviceNotConnectedException extends TrezorException {
   final ConnectionType connectionType;
   final String requestedOperation;
 
-  DeviceNotConnectedException({
+  const DeviceNotConnectedException({
     required this.connectionType,
     required this.requestedOperation,
   });
@@ -95,7 +87,7 @@ class ServiceNotSupportedException extends TrezorException {
   final String message;
   final Object? nestedError;
 
-  ServiceNotSupportedException({
+  const ServiceNotSupportedException({
     required this.connectionType,
     required this.message,
     this.nestedError,
@@ -111,7 +103,7 @@ class TrezorDeviceException extends TrezorException {
   final int errorCode;
   final ConnectionType connectionType;
 
-  TrezorDeviceException({
+  const TrezorDeviceException({
     this.message = "",
     this.cause,
     this.errorCode = 0x6F00,
@@ -127,7 +119,7 @@ class UnexpectedDataPacketException extends TrezorException {
   final UnexpectedDataPacketReason reason;
   final ConnectionType connectionType;
 
-  UnexpectedDataPacketException({
+  const UnexpectedDataPacketException({
     this.data,
     required this.reason,
     required this.connectionType,
@@ -142,4 +134,25 @@ enum UnexpectedDataPacketReason {
   indexAlreadySet,
   dataLengthAlreadySet,
   receivedDataWithNoPendingRequest,
+}
+
+class TrezorChannelException implements TrezorException {
+  const TrezorChannelException._(this.error);
+
+  factory TrezorChannelException.fromInt(int code) {
+    final message = switch (code) {
+      0x01 => "ThpTransportBusy",
+      0x02 => "ThpUnallocatedChannel",
+      0x03 => "ThpDecryptionFailed",
+      0x05 => "ThpDeviceLocked",
+      _ => "ThpUnknownError",
+    };
+
+    return TrezorChannelException._(message);
+  }
+
+  final String error;
+
+  @override
+  String toString() => "$runtimeType($error)";
 }

@@ -20,20 +20,7 @@ abstract class TrezorOperation<T> {
     return ThpHeaders(controlByteRaw: controlByteRaw, channel: channel, length: length);
   }
 
-  String readError(ByteDataReader reader) {
-    switch (reader.readUint8()) {
-      case 0x01:
-        return "ThpTransportBusy";
-      case 0x02:
-        return "ThpUnallocatedChannel";
-      case 0x03:
-        return "ThpDecryptionFailed";
-      case 0x05:
-        return "ThpDeviceLocked";
-      default:
-        return "ThpUnknownError";
-    }
-  }
+  int readError(ByteDataReader reader) => reader.readUint8();
 }
 
 abstract class TrezorTHPOperation<T> extends TrezorOperation<T> {
@@ -61,22 +48,6 @@ abstract class TrezorTHPOperation<T> extends TrezorOperation<T> {
     final length = reader.readUint16();
 
     return ThpHeaders(controlByteRaw: controlByteRaw, channel: channel, length: length);
-  }
-
-  @override
-  String readError(ByteDataReader reader) {
-    switch (reader.readUint8()) {
-      case 0x01:
-        return "ThpTransportBusy";
-      case 0x02:
-        return "ThpUnallocatedChannel";
-      case 0x03:
-        return "ThpDecryptionFailed";
-      case 0x05:
-        return "ThpDeviceLocked";
-      default:
-        return "ThpUnknownError";
-    }
   }
 }
 
