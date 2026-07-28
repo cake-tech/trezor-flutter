@@ -19,7 +19,7 @@ Future<void> thpHandshake(TrezorConnection connection, ThpState state) async {
   final cred = handleHandshakeInit(
     handshakeInitResponse: handshakeInitResponse,
     thpState: state,
-    knownCredentials: [], // ToDo: Autoconnect credentials
+    knownCredentials: state.pairingCredentials.where((e) => e.autoconnect == true).toList(),
     hostEphemeralKeys: hostEphemeralKeyPair,
     tryToUnlock: 0,
   );
@@ -46,6 +46,8 @@ Future<void> thpHandshake(TrezorConnection connection, ThpState state) async {
     ),
   );
   state.updateSyncBit(true);
+  state.updateAckBit(false);
+  await connection.sendOperation(TrezorThpAckOperation(state));
 
   state.isPaired = requiresParing != 0;
   state.phase = ThpPhase.pairing;
@@ -55,7 +57,4 @@ Future<void> thpHandshake(TrezorConnection connection, ThpState state) async {
     // finish pairing. device is ready to communicate without further interaction
     await thpPairingEnd(connection, state);
   }
-
-  state.updateAckBit(false);
-  await connection.sendOperation(TrezorThpAckOperation(state));
 }
