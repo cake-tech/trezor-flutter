@@ -130,7 +130,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> doAutoPair() async {
-    final auto = await (client as TrezorClientV2).getAutoparing();
+    final auto = await (client as TrezorClientV2).getAutoPairingCredentials();
     state.setPairingCredentials([auto]);
   }
 

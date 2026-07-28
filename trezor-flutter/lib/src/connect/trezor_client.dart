@@ -124,7 +124,5 @@ class TrezorClientV2 extends TrezorClient {
         passphrase: passphrase,
       );
 
-  Future<ThpCredentials> getAutoparing() {
-    return getThpCredentials(connection, state, true);
-  }
+  Future<ThpCredentials> getAutoPairingCredentials() => getThpCredentials(connection, state, true);
 }
