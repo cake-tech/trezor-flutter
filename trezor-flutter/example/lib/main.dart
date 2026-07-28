@@ -134,6 +134,11 @@ class _HomePageState extends State<HomePage> {
     state.setPairingCredentials([auto]);
   }
 
+  Future<void> refreshMoneroAddress() async {
+    final monAddress = await monero!.getWatchCredentials();
+    setState(() => moneroAddress = monAddress.$2);
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     body: Padding(
@@ -197,7 +202,12 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-          if (moneroAddress != null) AddressCard(addressType: "Monero", address: moneroAddress!),
+          if (moneroAddress != null)
+            AddressCard(
+              addressType: "Monero",
+              address: moneroAddress!,
+              onRefresh: refreshMoneroAddress,
+            ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

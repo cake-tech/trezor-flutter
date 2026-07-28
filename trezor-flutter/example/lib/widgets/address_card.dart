@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AddressCard extends StatelessWidget {
-  const AddressCard({super.key, required this.addressType, required this.address});
+  const AddressCard({
+    super.key,
+    required this.addressType,
+    required this.address,
+    required this.onRefresh,
+  });
 
   final String addressType;
   final String address;
+  final VoidCallback? onRefresh;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -25,6 +31,10 @@ class AddressCard extends StatelessWidget {
               '$addressType: ${address.substring(0, 8)}...${address.substring(address.length - 8)}',
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w600),
             ),
+          ),
+          IconButton(
+            icon: Icon(Icons.refresh, size: 18, color: Theme.of(context).colorScheme.primary),
+            onPressed: onRefresh,
           ),
           IconButton(
             icon: Icon(Icons.copy, size: 18, color: Theme.of(context).colorScheme.primary),
