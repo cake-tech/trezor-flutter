@@ -78,9 +78,7 @@ class _PinPopupState extends State<PinPopup> {
               SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: _pinController.text.isNotEmpty
-                      ? () => Navigator.of(context).pop(_pinController.text)
-                      : null,
+                  onPressed: () => Navigator.of(context).pop(_pinController.text),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(vertical: 12),

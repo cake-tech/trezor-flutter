@@ -37,6 +37,17 @@ Future<String> moneroSignTransaction(
     state.vinis.add(_ProtocolStateVinis.fromPB(setInputResponse, i, inputs[i]));
   }
 
+  // apply Monero input ordering
+  state.vinis.sort((a, b) {
+    final x = a.vini, y = b.vini;
+    final xo = x.length - 32, yo = y.length - 32;
+    for (var i = 0; i < 32; i++) {
+      final c = y[yo + i] - x[xo + i];
+      if (c != 0) return c;
+    }
+    return 0;
+  });
+
   for (final viniData in state.vinis) {
     await client.call(
       MoneroTransactionInputViniRequest(
@@ -180,7 +191,6 @@ extension SerializeTx on _ProtocolState {
 
     tx.write(VarInt.encodeMoneroVarint(txOuts.length)); // n Outputs
     for (final vout in txOuts) {
-      print(hex.encode(vout));
       tx.write(vout);
     }
 
