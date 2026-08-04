@@ -28,15 +28,16 @@ abstract class TrezorClient {
 
   final TrezorConnection connection;
 
+  Features? _features;
+
   /// Create a new Channel for THP or Initialize a new Session for V1.
   ///
   /// Pass [passphrase] to bind the wallet session in one step; otherwise call
   /// [createSession] after inspecting [passphraseAlwaysOnDevice].
   Future<void> createChannel({TrezorPassphrase? passphrase});
 
-  /// Bind a wallet session for [passphrase]; [resumeSessionId] is V1-only
-  Future<TrezorSessionInfo> createSession(TrezorPassphrase passphrase,
-      {List<int>? resumeSessionId});
+  /// Bind a wallet session for [passphrase]
+  Future<TrezorSessionInfo> createSession(TrezorPassphrase passphrase);
 
   /// Make a call to the Trezor Device
   Future<(int, Uint8List)> call(Uint8List message, TrezorMessageType messageType);
@@ -45,16 +46,12 @@ abstract class TrezorClient {
   Future<void> cancel();
 
   /// Whether the device forces passphrase entry on its own screen
-  bool get passphraseAlwaysOnDevice;
+  bool get passphraseAlwaysOnDevice => _features?.passphraseAlwaysOnDevice ?? false;
 }
 
 class TrezorClientV1 extends TrezorClient {
   List<int>? sessionId;
   final PassphraseIntentSlot _sessionIntent = PassphraseIntentSlot();
-  Features? _features;
-
-  @override
-  bool get passphraseAlwaysOnDevice => _features?.passphraseAlwaysOnDevice ?? false;
 
   TrezorClientV1(super.connection);
 
@@ -104,6 +101,8 @@ class TrezorClientV1 extends TrezorClient {
     _features = feature;
   }
 
+  /// [resumeSessionId] asks the device to keep a previous session, which skips
+  /// the passphrase prompt. THP has no equivalent, so it is V1-only.
   @override
   Future<TrezorSessionInfo> createSession(TrezorPassphrase passphrase,
       {List<int>? resumeSessionId}) async {
@@ -134,11 +133,6 @@ class TrezorClientV2 extends TrezorClient {
   final String appName;
   final String hostName;
   Future<String> Function() onPinCode;
-  List<int>? sessionId;
-  Features? _features;
-
-  @override
-  bool get passphraseAlwaysOnDevice => _features?.passphraseAlwaysOnDevice ?? false;
 
   TrezorClientV2(
     super.connection,
@@ -195,8 +189,7 @@ class TrezorClientV2 extends TrezorClient {
   }
 
   @override
-  Future<TrezorSessionInfo> createSession(TrezorPassphrase passphrase,
-      {List<int>? resumeSessionId}) {
+  Future<TrezorSessionInfo> createSession(TrezorPassphrase passphrase) {
     final intent = passphraseAlwaysOnDevice ? const TrezorPassphrase.onDevice() : passphrase;
     return thpCreateSession(connection, state, intent);
   }
