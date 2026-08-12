@@ -13,10 +13,27 @@ enum TrezorMessageType {
 
   buttonRequest(26), // device is waiting for user confirmation
   buttonAck(27), // host acknowledgment of button request
-  address(30),
   passphraseRequest(41),
   passphraseAck(42),
 
+  // Bitcoin
+  getPublicKey(11),
+  publicKey(12),
+  signTx(15),
+  txRequest(21),
+  txAck(22),
+  getAddress(29),
+  address(30),
+  signMessage(38),
+  verifyMessage(39),
+  messageSignature(40),
+  getOwnershipId(43),
+  ownershipId(44),
+  getOwnershipProof(49),
+  ownershipProof(50),
+  authorizeCoinJoin(51),
+
+  // Trezor Host Protocol (THP)
   thpCreateNewSession(1000),
   thpPairingRequest(1008),
   thpPairingRequestApproved(1009),
@@ -36,6 +53,7 @@ enum TrezorMessageType {
   thpNfcTagHost(1040),
   thpNfcTagTrezor(1041),
 
+  // Monero
   moneroTransactionInitRequest(501),
   moneroTransactionInitAck(502),
   moneroTransactionSetInputRequest(503),

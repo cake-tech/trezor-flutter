@@ -8,7 +8,6 @@ import 'package:trezor_flutter/src/trezor/protobuf/coins/messages-monero.pb.dart
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/utils/bip32_path.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
-import 'package:trezor_flutter/trezor_flutter.dart';
 
 class MoneroKeyImageTxData {
   final String outKey;

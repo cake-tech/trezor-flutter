@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:example/features/bitcoin.dart';
+import 'package:example/features/monero.dart';
 import 'package:example/widgets/address_card.dart';
 import 'package:example/widgets/device_card.dart';
 import 'package:example/widgets/pin_popup.dart';
@@ -87,6 +89,7 @@ class _HomePageState extends State<HomePage> {
   var state = ThpState();
   String? moneroAddress;
   TrezorMonero? monero;
+  TrezorBitcoin? bitcoin;
   TrezorClient? client;
 
   @override
@@ -132,11 +135,6 @@ class _HomePageState extends State<HomePage> {
   Future<void> doAutoPair() async {
     final auto = await (client as TrezorClientV2).getAutoPairingCredentials();
     state.setPairingCredentials([auto]);
-  }
-
-  Future<void> refreshMoneroAddress() async {
-    final monAddress = await monero!.getWatchCredentials();
-    setState(() => moneroAddress = monAddress.$2);
   }
 
   @override
@@ -194,21 +192,17 @@ class _HomePageState extends State<HomePage> {
 
                       await client!.createChannel();
 
-                      monero = TrezorMonero(client!);
-                      final monAddress = await monero!.getWatchCredentials();
-                      setState(() => moneroAddress = monAddress.$2);
+                      setState(() {
+                        monero = TrezorMonero(client!);
+                        bitcoin = TrezorBitcoin(client!);
+                      } );
                     },
                   ),
                 ),
               ),
             ),
-          if (moneroAddress != null)
-            AddressCard(
-              addressType: "Monero",
-              address: moneroAddress!,
-              onRefresh: refreshMoneroAddress,
-            ),
-          const SizedBox(height: 8),
+          if (monero != null) MoneroWidget(monero: monero!),
+          if (bitcoin != null) BitcoinWidget(bitcoin: bitcoin!),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -291,51 +285,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          if (monero != null)
-            Padding(
-              padding: EdgeInsets.only(top: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.sync, size: 18),
-                      label: Text("Sync KeyImages"),
-                      onPressed: () async {
-                        final res = await monero!.syncKeyImages(tdis);
-                        print(res.toMap());
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('KeyImages synced successfully'),
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.send, size: 18),
-                      label: Text("Send TX"),
-                      onPressed: () async {
-                        final res2 = await monero!.signTransaction(tx);
-                        print(res2);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Transaction signed'),
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     ),

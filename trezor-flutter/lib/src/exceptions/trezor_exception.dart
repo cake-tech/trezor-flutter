@@ -7,6 +7,15 @@ sealed class TrezorException implements Exception {
   const TrezorException();
 }
 
+class TrezorProtocolException extends TrezorException {
+  final String message;
+
+  const TrezorProtocolException(this.message);
+
+  @override
+  String toString() => "$runtimeType: $message";
+}
+
 class TrezorFailureException extends TrezorException {
   final Failure _fail;
 

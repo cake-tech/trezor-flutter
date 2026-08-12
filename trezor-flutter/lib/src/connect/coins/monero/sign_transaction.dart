@@ -212,7 +212,8 @@ extension SerializeTx on _ProtocolState {
       tx.write(outPk);
     }
 
-    tx.write(VarInt.encodeMoneroVarint(1)); // Todo dynamic?
+    final nbp = rsigParts.where((r) => r.isNotEmpty).length;
+    tx.write(VarInt.encodeMoneroVarint(nbp));
     for (final rsigPart in rsigParts) {
       tx.write(rsigPart);
     }
