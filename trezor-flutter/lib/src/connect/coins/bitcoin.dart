@@ -6,6 +6,8 @@ import 'package:trezor_flutter/src/models/trezor_tx.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/utils/bip32_path.dart';
 
+import '../../trezor/protobuf/messages-bitcoin.pb.dart';
+
 class TrezorBitcoin {
   final TrezorClient _client;
 
@@ -106,8 +108,8 @@ class TrezorBitcoin {
   }
 
   Future<TrezorSignedTx> signTransaction({
-    required List<TxInput> inputs,
-    required List<TxOutput> outputs,
+    required List<TrezorTxInput> inputs,
+    required List<TrezorTxOutput> outputs,
     Map<String, TrezorPrevTx> prevTxs = const {},
     int version = 2,
     int lockTime = 0,
