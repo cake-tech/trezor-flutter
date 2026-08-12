@@ -154,15 +154,15 @@ class TrezorPrevTxMeta {
   final int? branchId;
 
   TrezorPrevTxMeta({
-    required this.version,
-    required this.lockTime,
-    required this.inputsCount,
-    required this.outputsCount,
-    required this.extraDataLen,
-    required this.expiry,
-    required this.versionGroupId,
-    required this.timestamp,
-    required this.branchId,
+    this.version,
+    this.lockTime,
+    this.inputsCount,
+    this.outputsCount,
+    this.extraDataLen,
+    this.expiry,
+    this.versionGroupId,
+    this.timestamp,
+    this.branchId,
   });
 
   PrevTx toProtoBuf() => PrevTx(
