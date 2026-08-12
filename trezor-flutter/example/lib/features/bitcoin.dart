@@ -24,7 +24,7 @@ class _BitcoinWidgetState extends State<BitcoinWidget> {
 
   Future<void> _refreshPublicKeys() async {
     final res = await widget.bitcoin.getPublicKey(derivationPath: "m/84'/0'/0'", showDisplay: true);
-    debugPrint(res);
+    debugPrint(res.toString());
   }
 
   Future<void> _signMessage() async {

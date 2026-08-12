@@ -50,7 +50,7 @@ class TrezorBitcoin {
   /// [chunkify] determines if address will be displayed in chunks of 4 characters. Default is set to false
   /// [scriptType] "SPENDADDRESS" | "SPENDMULTISIG" | "SPENDWITNESS" | "SPENDP2SHWITNESS" | "SPENDTAPROOT" used to distinguish between various address formats (non-segwit, segwit, etc.).
   /// [ignoreXpubMagic] ignore SLIP-0132 XPUB magic, use xpub/tpub prefix for all account types.
-  Future<String> getPublicKey({
+  Future<(String, int)> getPublicKey({
     required String derivationPath,
     bool showDisplay = false,
     bool chunkify = false,
@@ -75,7 +75,7 @@ class TrezorBitcoin {
     );
     final result = PublicKey.fromBuffer(res.$2);
 
-    return result.xpub;
+    return (result.xpub, result.rootFingerprint);
   }
 
   Future<Uint8List> signMessage({
