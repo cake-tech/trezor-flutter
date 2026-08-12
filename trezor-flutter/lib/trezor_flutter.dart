@@ -8,6 +8,7 @@ export 'src/connect/trezor_client.dart';
 export 'src/models/bluetooth_options.dart';
 export 'src/models/connection_type.dart';
 export 'src/models/discovered_device.dart';
+export 'src/models/trezor_tx.dart';
 export 'src/models/trezor_device.dart';
 export 'src/trezor/protocol/v2/paring.dart';
 export 'src/trezor/protocol/v2/state.dart';

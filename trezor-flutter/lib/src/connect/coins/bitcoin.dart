@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:trezor_flutter/src/connect/coins/bitcoin/sign_transaction.dart';
 import 'package:trezor_flutter/src/connect/trezor_client.dart';
-import 'package:trezor_flutter/src/trezor/protobuf/messages-bitcoin.pb.dart';
+import 'package:trezor_flutter/src/models/trezor_tx.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/utils/bip32_path.dart';
 
@@ -77,7 +78,6 @@ class TrezorBitcoin {
     return result.xpub;
   }
 
-  /// Signs [message] with the key at [derivationPath] (BIP-137 style).
   Future<Uint8List> signMessage({
     required String derivationPath,
     required Uint8List message,
@@ -104,6 +104,23 @@ class TrezorBitcoin {
 
     return Uint8List.fromList(result.signature);
   }
+
+  Future<TrezorSignedTx> signTransaction({
+    required List<TxInput> inputs,
+    required List<TxOutput> outputs,
+    Map<String, TrezorPrevTx> prevTxs = const {},
+    int version = 2,
+    int lockTime = 0,
+  }) =>
+      bitcoinSignTransaction(
+        _client,
+        coinName: "Bitcoin",
+        inputs: inputs,
+        outputs: outputs,
+        prevTxs: prevTxs,
+        version: version,
+        lockTime: lockTime,
+      );
 
   InputScriptType? _getInputScriptType(String? inputScriptType) => switch (inputScriptType) {
         "SPENDADDRESS" => InputScriptType.SPENDADDRESS, // Legacy P2PKH
