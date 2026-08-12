@@ -14,6 +14,8 @@ abstract class ConnectionManager {
     TrezorTransformer? transformer,
   );
 
+  Future<void> sendOutOfBand(TrezorDevice device, TrezorOperation operation);
+
   Future<void> dispose();
 
   ConnectionType get connectionType;

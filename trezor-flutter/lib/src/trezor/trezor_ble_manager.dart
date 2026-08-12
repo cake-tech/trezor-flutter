@@ -160,6 +160,21 @@ class TrezorBleConnectionManager extends ConnectionManager {
   }
 
   @override
+  Future<void> sendOutOfBand(TrezorDevice device, TrezorOperation operation) async {
+    if (_disposed) throw TrezorManagerDisposedException(ConnectionType.ble);
+
+    final d = _connectedDevices[device.id];
+    if (d == null) {
+      throw DeviceNotConnectedException(
+        requestedOperation: 'ble_manager: sendOutOfBand',
+        connectionType: ConnectionType.ble,
+      );
+    }
+
+    return d.gateway.sendWriteOnly(operation);
+  }
+
+  @override
   Future<AvailabilityState> get status {
     if (_disposed) throw TrezorManagerDisposedException(ConnectionType.ble);
 
