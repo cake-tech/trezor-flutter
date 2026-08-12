@@ -39,7 +39,7 @@ class TrezorDecoder {
 
     final headers = ThpHeaders(controlByteRaw: controlByteRaw, channel: channel, length: length);
 
-    if (length >= reader.remainingLength) {
+    if (length > reader.remainingLength) {
       final payload = reader.read(reader.remainingLength);
       return TrezorPackageV2(headers: headers, payload: payload);
     }
