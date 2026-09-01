@@ -4,14 +4,15 @@ import 'package:protobuf/protobuf.dart' as $pb;
 import 'package:trezor_flutter/src/connect/trezor_client.dart';
 import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/models/trezor_tx.dart';
+import 'package:trezor_flutter/src/trezor/protobuf/messages-bitcoin.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
 
 Future<TrezorSignedTx> bitcoinSignTransaction(
   TrezorClient client, {
   required String coinName,
-  required List<TxInput> inputs,
-  required List<TxOutput> outputs,
+  required List<TrezorTxInput> inputs,
+  required List<TrezorTxOutput> outputs,
   Map<String, TrezorPrevTx> prevTxs = const {},
   int version = 2,
   int lockTime = 0,
@@ -64,8 +65,8 @@ Future<TrezorSignedTx> bitcoinSignTransaction(
 
 $pb.GeneratedMessage _buildAck(
   TxRequest request,
-  List<TxInput> inputs,
-  List<TxOutput> outputs,
+  List<TrezorTxInput> inputs,
+  List<TrezorTxOutput> outputs,
   Map<String, TrezorPrevTx> prevTxs,
 ) {
   final details = request.details;
@@ -91,21 +92,29 @@ $pb.GeneratedMessage _buildAck(
     case TxRequest_RequestType.TXINPUT:
       if (details.hasTxHash()) {
         return TxAckPrevInput(
-            tx: TxAckPrevInput_TxAckPrevInputWrapper(
-                input: indexed(prevTx().inputs, "previous input")));
+          tx: TxAckPrevInput_TxAckPrevInputWrapper(
+            input: indexed(prevTx().inputs, "previous input").toProtoBuf()
+          ),
+        );
       }
-      return TxAckInput(tx: TxAckInput_TxAckInputWrapper(input: indexed(inputs, "input")));
+      return TxAckInput(
+        tx: TxAckInput_TxAckInputWrapper(input: indexed(inputs, "input").toProtoBuf()),
+      );
 
     case TxRequest_RequestType.TXOUTPUT:
       if (details.hasTxHash()) {
         return TxAckPrevOutput(
-            tx: TxAckPrevOutput_TxAckPrevOutputWrapper(
-                output: indexed(prevTx().outputs, "previous output")));
+          tx: TxAckPrevOutput_TxAckPrevOutputWrapper(
+            output: indexed(prevTx().outputs, "previous output").toProtoBuf(),
+          ),
+        );
       }
-      return TxAckOutput(tx: TxAckOutput_TxAckOutputWrapper(output: indexed(outputs, "output")));
+      return TxAckOutput(
+        tx: TxAckOutput_TxAckOutputWrapper(output: indexed(outputs, "output").toProtoBuf()),
+      );
 
     case TxRequest_RequestType.TXMETA:
-      return TxAckPrevMeta(tx: prevTx().meta);
+      return TxAckPrevMeta(tx: prevTx().meta.toProtoBuf());
 
     case TxRequest_RequestType.TXEXTRADATA:
       final chunk = prevTx().extraData.sublist(
@@ -113,7 +122,8 @@ $pb.GeneratedMessage _buildAck(
             details.extraDataOffset + details.extraDataLen,
           );
       return TxAckPrevExtraData(
-          tx: TxAckPrevExtraData_TxAckPrevExtraDataWrapper(extraDataChunk: chunk));
+        tx: TxAckPrevExtraData_TxAckPrevExtraDataWrapper(extraDataChunk: chunk),
+      );
 
     default:
       throw TrezorProtocolException("Unsupported TxRequest type ${request.requestType} "

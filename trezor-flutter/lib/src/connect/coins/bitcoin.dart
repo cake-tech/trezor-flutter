@@ -6,6 +6,8 @@ import 'package:trezor_flutter/src/models/trezor_tx.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/utils/bip32_path.dart';
 
+import '../../trezor/protobuf/messages-bitcoin.pb.dart';
+
 class TrezorBitcoin {
   final TrezorClient _client;
 
@@ -50,7 +52,7 @@ class TrezorBitcoin {
   /// [chunkify] determines if address will be displayed in chunks of 4 characters. Default is set to false
   /// [scriptType] "SPENDADDRESS" | "SPENDMULTISIG" | "SPENDWITNESS" | "SPENDP2SHWITNESS" | "SPENDTAPROOT" used to distinguish between various address formats (non-segwit, segwit, etc.).
   /// [ignoreXpubMagic] ignore SLIP-0132 XPUB magic, use xpub/tpub prefix for all account types.
-  Future<String> getPublicKey({
+  Future<(String, int)> getPublicKey({
     required String derivationPath,
     bool showDisplay = false,
     bool chunkify = false,
@@ -75,7 +77,7 @@ class TrezorBitcoin {
     );
     final result = PublicKey.fromBuffer(res.$2);
 
-    return result.xpub;
+    return (result.xpub, result.rootFingerprint);
   }
 
   Future<Uint8List> signMessage({
@@ -106,8 +108,8 @@ class TrezorBitcoin {
   }
 
   Future<TrezorSignedTx> signTransaction({
-    required List<TxInput> inputs,
-    required List<TxOutput> outputs,
+    required List<TrezorTxInput> inputs,
+    required List<TrezorTxOutput> outputs,
     Map<String, TrezorPrevTx> prevTxs = const {},
     int version = 2,
     int lockTime = 0,
