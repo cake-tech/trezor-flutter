@@ -10,8 +10,7 @@ String normalizePassphrase(String raw) {
   final normalized = unorm.nfkd(raw);
   final byteLength = utf8.encode(normalized).length;
   if (byteLength > 50) {
-    throw ArgumentError(
-        'Passphrase exceeds 50 bytes after NFKD normalization ($byteLength bytes)');
+    throw ArgumentError('Passphrase exceeds 50 bytes after NFKD normalization ($byteLength bytes)');
   }
   return normalized;
 }
@@ -49,8 +48,7 @@ class TrezorPassphraseConsumed extends TrezorPassphrase {
 
 PassphraseAck buildPassphraseAck(TrezorPassphrase intent) => switch (intent) {
       TrezorPassphraseEmpty() => PassphraseAck(passphrase: ''),
-      TrezorPassphraseValue(:final passphrase) =>
-        PassphraseAck(passphrase: passphrase),
+      TrezorPassphraseValue(:final passphrase) => PassphraseAck(passphrase: passphrase),
       TrezorPassphraseOnDevice() => PassphraseAck(onDevice: true),
       TrezorPassphraseConsumed() => throw const TrezorSessionExpiredException(),
     };
@@ -60,10 +58,9 @@ PassphraseAck buildPassphraseAck(TrezorPassphrase intent) => switch (intent) {
 ThpCreateNewSession buildThpCreateNewSession(TrezorPassphrase intent,
         {bool deriveCardano = false}) =>
     switch (intent) {
-      TrezorPassphraseEmpty() =>
-        ThpCreateNewSession(passphrase: '', deriveCardano: deriveCardano),
-      TrezorPassphraseValue(:final passphrase) => ThpCreateNewSession(
-          passphrase: passphrase, deriveCardano: deriveCardano),
+      TrezorPassphraseEmpty() => ThpCreateNewSession(passphrase: '', deriveCardano: deriveCardano),
+      TrezorPassphraseValue(:final passphrase) =>
+        ThpCreateNewSession(passphrase: passphrase, deriveCardano: deriveCardano),
       TrezorPassphraseOnDevice() =>
         ThpCreateNewSession(onDevice: true, deriveCardano: deriveCardano),
       TrezorPassphraseConsumed() => throw const TrezorSessionExpiredException(),
@@ -75,8 +72,7 @@ class PassphraseIntentSlot {
 
   void store(TrezorPassphrase intent) => _intent = intent;
 
-  PassphraseAck ackMessage() =>
-      buildPassphraseAck(_intent ?? const TrezorPassphrase.empty());
+  PassphraseAck ackMessage() => buildPassphraseAck(_intent ?? const TrezorPassphrase.empty());
 
   void markUsed() {
     if (_intent is TrezorPassphraseValue) {

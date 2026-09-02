@@ -1,7 +1,4 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
-
 import 'package:trezor_flutter/src/connect/acquire.dart';
 import 'package:trezor_flutter/src/connect/pairing.dart';
 import 'package:trezor_flutter/src/connect/trezor_thp_call.dart';
@@ -34,7 +31,7 @@ abstract class TrezorClient {
   ///
   /// Pass [passphrase] to bind the wallet session in one step; otherwise call
   /// [createSession] after inspecting [passphraseAlwaysOnDevice].
-  Future<void> createChannel({TrezorPassphrase? passphrase});
+  Future<void> createChannel({TrezorPassphrase passphrase = const TrezorPassphrase.empty()});
 
   /// Bind a wallet session for [passphrase]
   Future<TrezorSessionInfo> createSession(TrezorPassphrase passphrase);
@@ -84,8 +81,8 @@ class TrezorClientV1 extends TrezorClient {
   Future<void> cancel() => connection.disconnect();
 
   @override
-  Future<void> createChannel({TrezorPassphrase? passphrase}) async {
-    if (passphrase != null) _sessionIntent.store(passphrase);
+  Future<void> createChannel({TrezorPassphrase passphrase = const TrezorPassphrase.empty()}) async {
+    _sessionIntent.store(passphrase);
     if (sessionId != null) return;
 
     final initialize = await connection.sendOperation(
@@ -173,7 +170,7 @@ class TrezorClientV2 extends TrezorClient {
   }
 
   @override
-  Future<void> createChannel({TrezorPassphrase? passphrase}) async {
+  Future<void> createChannel({TrezorPassphrase passphrase = const TrezorPassphrase.empty()}) async {
     await getThpChannel(
       connection,
       state,
@@ -185,7 +182,7 @@ class TrezorClientV2 extends TrezorClient {
     final features = await call(GetFeatures().writeToBuffer(), TrezorMessageType.getFeatures);
     _features = Features.fromBuffer(features.$2);
 
-    if (passphrase != null) await createSession(passphrase);
+    await createSession(passphrase);
   }
 
   @override
