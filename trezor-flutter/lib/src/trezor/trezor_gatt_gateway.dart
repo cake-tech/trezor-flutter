@@ -121,6 +121,10 @@ class TrezorGattGateway extends GattGateway {
         final int? timestamp,
       ) async {
         if (trezor.device.id != deviceId) return;
+        // A gateway that was torn down (link lost, reconnect in progress) must
+        // not act on packets that arrive for its device id afterwards.
+        if (_disposed) return;
+        if (rawData.isEmpty) return;
 
         if (THPControlByte.decode(rawData.first) == THPControlByte.ackMessage) {
           print("AckMessage ignored");
@@ -179,9 +183,20 @@ class TrezorGattGateway extends GattGateway {
           seenPackages.clear();
           _pendingOperations.removeFirst();
           request.completer.complete(response);
-        } catch (ex) {
+        } on TrezorException catch (ex) {
+          // A well-formed packet the device used to report an error.
           _handleOnError(ex);
           _onError?.call(ex);
+        } catch (ex) {
+          // A packet that could not be decoded (e.g. a stale fragment left over
+          // from before a link drop, or a truncated notification). Dropping it
+          // and resetting the partial reassembly lets the real response through
+          // instead of failing the request with a bare StateError.
+          print("Malformed packet ignored: $ex");
+          if (_pendingOperations.isNotEmpty) {
+            _pendingOperations.first.decodedPackage = null;
+          }
+          seenPackages.clear();
         }
       };
     } catch (e) {
