@@ -27,6 +27,8 @@ abstract class TrezorClient {
 
   Features? _features;
 
+  Features? get features => _features;
+
   /// Create a new Channel for THP or Initialize a new Session for V1.
   ///
   /// Pass [passphrase] to bind the wallet session in one step; otherwise call
