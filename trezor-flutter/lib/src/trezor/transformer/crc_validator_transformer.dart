@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:trezor_flutter/src/api/api.dart';
+import 'package:trezor_flutter/src/api/trezor_transformer.dart';
 import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/trezor/crypto/crypto.dart';
 import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
@@ -30,7 +30,8 @@ class CrcValidator extends TrezorTransformer {
     if (calculatedCrc != expectedCrc) throw Exception("Crc Missmatch");
 
     if (controlByteRaw == THPControlByte.error.byte) {
-      throw TrezorChannelException.fromInt(payload.first);
+      throw TrezorChannelException(
+          payload.isEmpty ? TrezorChannelError.unknown : TrezorChannelError.fromCode(payload.first));
     }
 
     return bytes;

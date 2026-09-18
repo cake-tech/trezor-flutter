@@ -139,15 +139,23 @@ Future<void> thpPairingEnd(TrezorConnection connection, ThpState state) async {
 ///
 /// This sends ThpCreateNewSession and waits for Success.
 /// Must be called after handshake is complete but before sending other messages.
-Future<void> thpCreateSession(
-    TrezorConnection connection, ThpState state, String? passphrase) async {
+Future<TrezorSessionInfo> thpCreateSession(
+  TrezorConnection connection,
+  ThpState state,
+  TrezorPassphrase passphrase,
+) async {
   state.createNewSessionId();
 
   await thpCall(
     connection,
     state,
-    ThpCreateNewSession(passphrase: passphrase ?? "", onDevice: false, deriveCardano: false)
-        .writeToBuffer(),
+    buildThpCreateNewSession(passphrase).writeToBuffer(),
     TrezorMessageType.thpCreateNewSession,
+  );
+
+  return TrezorSessionInfo(
+    enteredOnDevice: passphrase is TrezorPassphraseOnDevice,
+    resumed: false,
+    sessionId: state.sessionId,
   );
 }

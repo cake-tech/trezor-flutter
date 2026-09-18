@@ -41,7 +41,7 @@ class TrezorThpHandshakeCompletionOperation extends TrezorTHPOperation<int> {
     final headers = readHeaders(reader);
 
     if (headers.controlByte == THPControlByte.error) {
-      throw TrezorChannelException.fromInt(readError(reader));
+      throw TrezorChannelException(readError(reader));
     }
 
     final cipherText = reader.read(headers.length - 4);

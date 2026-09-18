@@ -2,16 +2,13 @@ import 'dart:io';
 
 import 'package:example/features/bitcoin.dart';
 import 'package:example/features/monero.dart';
-import 'package:example/widgets/address_card.dart';
 import 'package:example/widgets/device_card.dart';
 import 'package:example/widgets/pin_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
-import 'monero_tx.dart';
-
-bool usbMode = false;
+bool usbMode = true;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -190,12 +187,15 @@ class _HomePageState extends State<HomePage> {
                         onCodePin,
                       );
 
-                      await client!.createChannel();
+                      await client!.createChannel(
+                        // passphrase: TrezorPassphrase.value("CakeWallet"),
+                        // passphrase: TrezorPassphrase.onDevice(),
+                      );
 
                       setState(() {
                         monero = TrezorMonero(client!);
                         bitcoin = TrezorBitcoin(client!);
-                      } );
+                      });
                     },
                   ),
                 ),
@@ -249,42 +249,90 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: Icon(Icons.refresh, size: 18),
-                  label: Text("Auto paring"),
-                  onPressed: doAutoPair,
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    side: BorderSide(color: Theme.of(context).colorScheme.outline),
-                    foregroundColor: Theme.of(context).colorScheme.onSurface,
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: Icon(Icons.restart_alt, size: 18),
-                  label: Text("Load State"),
-                  onPressed: () => setState(
-                    () => state = ThpState.fromJson(
-                      '{"properties":{"1":"T3W1","2":1,"3":2,"4":1,"5":[2]},"credentials":[{"trezorStaticPublicKey":"8b6ace3e9ba34c14ea3e12abecaa89b228aab5ef225d47cb957d5815a9d6ad79","credential":"0a240a1543616b652057616c6c6574204465762050686f6e6510011a0943616b65205465636812203b968b85785c115f47209493f3c6a12802b79aa3cd4ead54016e1e77cc852255","hostStaticKey":"4b9738965e62d5b1c034125008e0dafa4dda0da6359c03f4d481a09d6577b65c","autoconnect":true}],"channel":18784,"sendBit":0,"recvBit":0,"sendAckBit":0,"recvAckBit":1,"sendNonce":14,"recvNonce":15,"piggybackAckEnabled":false}',
+          if (client is TrezorClientV2)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: Icon(Icons.refresh, size: 18),
+                    label: Text("Auto paring"),
+                    onPressed: doAutoPair,
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                      foregroundColor: Theme.of(context).colorScheme.onSurface,
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                   ),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
-                    foregroundColor: Colors.red,
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: Icon(Icons.restart_alt, size: 18),
+                    label: Text("Load State"),
+                    onPressed: () => setState(
+                      () => state = ThpState.fromJson(
+                        '{"properties":{"1":"T3W1","2":1,"3":2,"4":1,"5":[2]},"credentials":[{"trezorStaticPublicKey":"8b6ace3e9ba34c14ea3e12abecaa89b228aab5ef225d47cb957d5815a9d6ad79","credential":"0a240a1543616b652057616c6c6574204465762050686f6e6510011a0943616b65205465636812203b968b85785c115f47209493f3c6a12802b79aa3cd4ead54016e1e77cc852255","hostStaticKey":"4b9738965e62d5b1c034125008e0dafa4dda0da6359c03f4d481a09d6577b65c","autoconnect":true}],"channel":18784,"sendBit":0,"recvBit":0,"sendAckBit":0,"recvAckBit":1,"sendNonce":14,"recvNonce":15,"piggybackAckEnabled":false}',
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
+                      foregroundColor: Colors.red,
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          if (client is TrezorClientV1)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: Icon(Icons.phone_android, size: 18),
+                    label: Text("App"),
+                    onPressed: () => client!.createSession(TrezorPassphrase.value("CakeWallet")),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                      foregroundColor: Theme.of(context).colorScheme.onSurface,
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: Icon(Icons.key, size: 18),
+                    label: Text("Device"),
+                    onPressed: () => client!.createSession(TrezorPassphrase.onDevice()),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                      foregroundColor: Theme.of(context).colorScheme.onSurface,
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: Icon(Icons.restart_alt, size: 18),
+                    label: Text("No Passphrase"),
+                    onPressed: () => client!.createSession(TrezorPassphrase.empty()),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
+                      foregroundColor: Colors.red,
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     ),

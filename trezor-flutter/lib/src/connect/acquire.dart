@@ -15,7 +15,6 @@ Future<bool> getThpChannel(
   required String hostName,
   required String appName,
   required Future<String> Function() onCodeCode,
-  String? passphrase,
 }) async {
   if (state.phase == ThpPhase.handshake) {
     await createThpChannel(connection, state);
@@ -32,8 +31,5 @@ Future<bool> getThpChannel(
     }
   }
 
-  if (state.phase != ThpPhase.paired) return false;
-
-  await thpCreateSession(connection, state, passphrase);
-  return true;
+  return state.phase == ThpPhase.paired;
 }
