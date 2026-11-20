@@ -50,7 +50,7 @@ class TrezorMonero {
     );
     final result = MoneroAddress.fromBuffer(res.$2);
     final address = utf8.decode(result.address);
-    _log.fine('getAddress: received $address');
+    _log.fine('getAddress: received ${address.substring(0, 5)}...');
 
     return address;
   }
