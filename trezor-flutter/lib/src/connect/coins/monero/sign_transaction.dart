@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/digests/keccak.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/coins/messages-monero.pb.dart';
@@ -8,6 +9,8 @@ import 'package:trezor_flutter/src/utils/hex_utils.dart';
 import 'package:trezor_flutter/src/utils/varint.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
+final _log = Logger('trezor_flutter.monero.signTransaction');
+
 Future<String> moneroSignTransaction(
   TrezorClient client, {
   required int version,
@@ -16,6 +19,8 @@ Future<String> moneroSignTransaction(
   required List<MoneroTransactionSourceEntry> inputs,
 }) async {
   final state = _ProtocolState();
+
+  _log.info('Init: ${inputs.length} inputs, ${tsxData.outputs.length} outputs');
 
   final initResponseRaw = await client.call(
     MoneroTransactionInitRequest(version: version, addressN: addressN, tsxData: tsxData)
@@ -27,6 +32,7 @@ Future<String> moneroSignTransaction(
   state.hmacs = initResponse.hmacs;
 
   for (var i = 0; i < inputs.length; i++) {
+    _log.fine('SetInput ${i + 1}/${inputs.length}');
     final setInputResponseRaw = await client.call(
       MoneroTransactionSetInputRequest(srcEntr: inputs[i]).writeToBuffer(),
       TrezorMessageType.moneroTransactionSetInputRequest,
@@ -49,6 +55,7 @@ Future<String> moneroSignTransaction(
   });
 
   for (final viniData in state.vinis) {
+    _log.fine('InputVini origIdx=${viniData.origIdx}');
     await client.call(
       MoneroTransactionInputViniRequest(
         srcEntr: viniData.srcEntr,
@@ -62,12 +69,14 @@ Future<String> moneroSignTransaction(
     );
   }
 
+  _log.fine('All inputs set');
   await client.call(
     MoneroTransactionAllInputsSetRequest().writeToBuffer(),
     TrezorMessageType.moneroTransactionAllInputsSetRequest,
   );
 
   for (var i = 0; i < tsxData.outputs.length; i++) {
+    _log.fine('SetOutput ${i + 1}/${tsxData.outputs.length}');
     final setOutputResponseRaw = await client.call(
       MoneroTransactionSetOutputRequest(dstEntr: tsxData.outputs[i], dstEntrHmac: state.hmacs[i])
           .writeToBuffer(),
@@ -84,6 +93,7 @@ Future<String> moneroSignTransaction(
     state.rsigParts.add(setOutputResponse.rsigData.rsig);
   }
 
+  _log.fine('AllOutSet');
   final allOutSetResponseRaw = await client.call(
     MoneroTransactionAllOutSetRequest().writeToBuffer(),
     TrezorMessageType.moneroTransactionAllOutSetRequest,
@@ -98,6 +108,7 @@ Future<String> moneroSignTransaction(
   // Step 7: SignInput - Generate CLSAG signatures for each input
   for (var i = 0; i < state.vinis.length; i++) {
     final viniData = state.vinis[i];
+    _log.fine('SignInput ${i + 1}/${state.vinis.length} (origIdx=${viniData.origIdx})');
     final signResponseRaw = await client.call(
       MoneroTransactionSignInputRequest(
         srcEntr: viniData.srcEntr,
@@ -120,13 +131,17 @@ Future<String> moneroSignTransaction(
   }
 
   // Step 8: Final - Get encryption keys
+  _log.fine('Final');
   final finalResponseRaw = await client.call(
     MoneroTransactionFinalRequest().writeToBuffer(),
     TrezorMessageType.moneroTransactionFinalRequest,
   );
   final finalResponse = MoneroTransactionFinalAck.fromBuffer(finalResponseRaw.$2);
 
-  return state.toMoneroTx(openingKey: finalResponse.openingKey);
+  final txHex = state.toMoneroTx(openingKey: finalResponse.openingKey);
+  _log.info('Signed transaction (${txHex.length ~/ 2} bytes)');
+
+  return txHex;
 }
 
 class _ProtocolState {
@@ -270,5 +285,9 @@ void _verifyTransactionPrefix({
 }) {
   final prefix = KeccakDigest(256).process(Uint8List.fromList(computedPrefix));
 
-  if (!listEquals(prefix, expectedPrefix)) throw ArgumentError("invalid transaction prefix");
+  if (!listEquals(prefix, expectedPrefix)) {
+    _log.severe('Transaction prefix hash mismatch: '
+        'computed=${hex.encode(prefix)} expected=${hex.encode(expectedPrefix)}');
+    throw ArgumentError("invalid transaction prefix");
+  }
 }

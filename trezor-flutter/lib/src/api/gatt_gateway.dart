@@ -25,6 +25,8 @@ abstract class GattGateway {
 
   Future<T> sendOperation<T>(TrezorOperation<T> operation, {TrezorTransformer? transformer});
 
+  Future<void> sendWriteOnly(TrezorOperation operation);
+
   Future<BleService?> getService(String serviceId);
 
   Future<BleCharacteristic?> getCharacteristic(BleService service, String characteristic);

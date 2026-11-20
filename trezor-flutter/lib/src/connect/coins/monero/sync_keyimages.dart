@@ -1,14 +1,19 @@
 import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
+import 'package:logging/logging.dart';
 import 'package:pointycastle/digests/keccak.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/coins/messages-monero.pb.dart';
 import 'package:trezor_flutter/src/trezor/protobuf/utils.dart';
 import 'package:trezor_flutter/src/utils/hex_utils.dart';
 import 'package:trezor_flutter/trezor_flutter.dart';
 
+final _log = Logger('trezor_flutter.monero.syncKeyImages');
+
 Future<MoneroKeyImageResponse> moneroSyncKeyImages(TrezorClient client,
     {required List<MoneroKeyImageTxData> tdis, required Iterable<int> addressN}) async {
+  _log.info('Syncing ${tdis.length} key images');
+
   // Compute hash of all tdis for verification
   final tdHashes = <Uint8List>[];
   for (final tdi in tdis) {
@@ -37,6 +42,7 @@ Future<MoneroKeyImageResponse> moneroSyncKeyImages(TrezorClient client,
   final hashBytes = Uint8List(finalKck.digestSize);
   finalKck.doFinal(hashBytes, 0);
 
+  _log.fine('ExportInit: hash=${hex.encode(hashBytes)}');
   await client.call(
     MoneroKeyImageExportInitRequest(
       num: Int64(tdis.length),
@@ -60,6 +66,7 @@ Future<MoneroKeyImageResponse> moneroSyncKeyImages(TrezorClient client,
       ),
     ),
   );
+  _log.fine('SyncStep: ${tdis.length} transfer details');
   final stepResponse = await client.call(
     syncStepRequest.writeToBuffer(),
     TrezorMessageType.moneroKeyImageSyncStepRequest,
@@ -70,11 +77,16 @@ Future<MoneroKeyImageResponse> moneroSyncKeyImages(TrezorClient client,
     stepData.kis.map((e) => MoneroExportedKeyImage(hex.encode(e.iv), hex.encode(e.blob))),
   );
 
+  _log.fine('SyncStep: received ${stepData.kis.length} key images');
+
+  _log.fine('SyncFinal');
   final finalResponse = await client.call(
     MoneroKeyImageSyncFinalRequest().writeToBuffer(),
     TrezorMessageType.moneroKeyImageSyncFinalRequest,
   );
   final finalData = MoneroKeyImageSyncFinalAck.fromBuffer(finalResponse.$2);
+
+  _log.info('Synced ${allKeyImages.length} key images');
 
   return MoneroKeyImageResponse(allKeyImages, hex.encode(finalData.encKey));
 }

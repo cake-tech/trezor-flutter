@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/operations/trezor_operations.dart';
 import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
 import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
@@ -50,7 +51,9 @@ class TrezorThpHandshakeInitOperation extends TrezorTHPOperation<ThpHandshakeIni
   Future<ThpHandshakeInitResponse> read(ByteDataReader reader) async {
     final headers = readHeaders(reader);
 
-    if (headers.controlByte == THPControlByte.error) throw Exception(readError(reader));
+    if (headers.controlByte == THPControlByte.error) {
+      throw TrezorChannelException(readError(reader));
+    }
 
     final trezorEphemeralPubkey = reader.read(32);
     final trezorEncryptedStaticPubkey = reader.read(48);

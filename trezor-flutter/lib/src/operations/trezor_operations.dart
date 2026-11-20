@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:trezor_flutter/src/exceptions/trezor_exception.dart';
 import 'package:trezor_flutter/src/trezor/protocol/constants/constants_v2.dart';
 import 'package:trezor_flutter/src/trezor/protocol/v2/state.dart';
 import 'package:trezor_flutter/src/trezor/crypto/crypto.dart';
@@ -20,7 +21,8 @@ abstract class TrezorOperation<T> {
     return ThpHeaders(controlByteRaw: controlByteRaw, channel: channel, length: length);
   }
 
-  int readError(ByteDataReader reader) => reader.readUint8();
+  TrezorChannelError readError(ByteDataReader reader) =>
+      TrezorChannelError.fromCode(reader.readUint8());
 }
 
 abstract class TrezorTHPOperation<T> extends TrezorOperation<T> {

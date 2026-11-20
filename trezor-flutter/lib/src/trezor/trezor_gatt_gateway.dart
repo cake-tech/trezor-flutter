@@ -121,6 +121,8 @@ class TrezorGattGateway extends GattGateway {
         final int? timestamp,
       ) async {
         if (trezor.device.id != deviceId) return;
+        if (_disposed) return;
+        if (rawData.isEmpty) return;
 
         if (THPControlByte.decode(rawData.first) == THPControlByte.ackMessage) {
           print("AckMessage ignored");
@@ -179,9 +181,15 @@ class TrezorGattGateway extends GattGateway {
           seenPackages.clear();
           _pendingOperations.removeFirst();
           request.completer.complete(response);
-        } catch (ex) {
+        } on TrezorException catch (ex) {
           _handleOnError(ex);
           _onError?.call(ex);
+        } catch (ex) {
+          print("Malformed packet ignored: $ex");
+          if (_pendingOperations.isNotEmpty) {
+            _pendingOperations.first.decodedPackage = null;
+          }
+          seenPackages.clear();
         }
       };
     } catch (e) {
@@ -218,6 +226,19 @@ class TrezorGattGateway extends GattGateway {
       _pendingOperations.addFirst(_Request(operation, transformer, completer));
     }
 
+    await _writePayloads(operation);
+
+    if (operation is TrezorThpAckOperation) {
+      completer.complete();
+    }
+
+    return completer.future;
+  }
+
+  @override
+  Future<void> sendWriteOnly(TrezorOperation operation) => _writePayloads(operation);
+
+  Future<void> _writePayloads(TrezorOperation operation) async {
     final writer = ByteDataWriter();
     final output = await operation.write(writer);
     final payloads = _packer.pack(output, 244);
@@ -230,13 +251,7 @@ class TrezorGattGateway extends GattGateway {
         withoutResponse: false,
         timeout: _bleWriteTimeout,
       );
-
-      if (operation is TrezorThpAckOperation) {
-        completer.complete();
-      }
     }
-
-    return completer.future;
   }
 
   @override

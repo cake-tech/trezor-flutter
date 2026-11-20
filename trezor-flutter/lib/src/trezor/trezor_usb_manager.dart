@@ -88,6 +88,19 @@ class TrezorUsbManager extends ConnectionManager {
     }
   }
 
+  @override
+  Future<void> sendOutOfBand(TrezorDevice device, TrezorOperation operation) async {
+    if (_disposed) throw TrezorManagerDisposedException(connectionType);
+
+    try {
+      final writer = ByteDataWriter();
+      final payload = await operation.write(writer);
+      await _usbTransport.transferOut(payload);
+    } on PlatformException catch (ex) {
+      throw TrezorExceptionUtils.fromPlatformException(ex, connectionType);
+    }
+  }
+
   @override // TODO this may need to be implemented
   Stream<BleConnectionState> get deviceStateChanges {
     if (_disposed) throw TrezorManagerDisposedException(connectionType);
