@@ -26,6 +26,7 @@ dependencies:
   pointycastle: ^3.7.3
   fast_base58: ^0.2.1
   unorm_dart: ^0.3.2
+  logging: ^1.2.0
 
 dev_dependencies:
   # flutter_test:
